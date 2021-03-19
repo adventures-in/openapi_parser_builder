@@ -9,6 +9,8 @@ environment:
 dependencies:
   build: any
   path: any
+  markdown: any
+  html: any
 
 dev_dependencies:
   build_config: any
