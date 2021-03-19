@@ -1,0 +1,15 @@
+targets:
+  openapi_client_builder_builder:openapi_client_builder_builder:
+    builders:
+      openapi_client_builder_builder|clientBuilderBuilder:
+        enabled: True
+
+builders:
+  clientBuilder:
+    import: 'package:openapi_client_builder_builder/openapi_client_builder_builder.dart'
+    builder_factories: ['clientBuilderBuilder']
+    build_extensions:
+      openapi_spec.md:
+        - builder_classes.dart
+    build_to: source
+    auto_apply: root_package
