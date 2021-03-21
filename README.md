@@ -12,6 +12,12 @@ main() {
 }
 ```
 
+## Testing 
+
+For faster iterations, we save the html string generated when running the builder.  If the markdown changes, a new html string should be saved for the tests. 
+
+- a quick way to do this is to change the `client_builder_builder.dart` to use `html` in place of `combinedOutput` in `buildStep.writeAsString`, then copy the html from `schema_classes.dart` to `test/data/openapi_spec_html.dart`.
+
 ## Data cleaning
 
 Each data cleaning listed below was committed separately, with a commit message of the form: 'Data clean: -subheading-' (referring to the subheadings below)
@@ -28,3 +34,8 @@ I had to edit the md file to make this true.
 ### add extra '/' to /| separator
 
 When the markdown is converted to html, the /| separator (used to indicate union types) becomes just '|' nd is thus indistinguidable from the table separator in the markdown ('|' in markdown which also becomes '|' in the html).
+
+### add spaces to more tables
+
+- 'summary' member of Path Item Object
+- 'securitySchemes' member of Components Object

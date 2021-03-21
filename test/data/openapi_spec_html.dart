@@ -347,7 +347,7 @@ All objects defined within the components object will have no effect on the API 
 <a name="componentsExamples"></a> examples | Map[<code>string</code>, <a href="#exampleObject">Example Object</a> \| <a href="#referenceObject">Reference Object</a>] | An object to hold reusable <a href="#exampleObject">Example Objects</a>.
 <a name="componentsRequestBodies"></a> requestBodies | Map[<code>string</code>, <a href="#requestBodyObject">Request Body Object</a> \| <a href="#referenceObject">Reference Object</a>] | An object to hold reusable <a href="#requestBodyObject">Request Body Objects</a>.
 <a name="componentsHeaders"></a> headers | Map[<code>string</code>, <a href="#headerObject">Header Object</a> \| <a href="#referenceObject">Reference Object</a>] | An object to hold reusable <a href="#headerObject">Header Objects</a>.
-<a name="componentsSecuritySchemes"></a> securitySchemes| Map[<code>string</code>, <a href="#securitySchemeObject">Security Scheme Object</a> \| <a href="#referenceObject">Reference Object</a>] | An object to hold reusable <a href="#securitySchemeObject">Security Scheme Objects</a>.
+<a name="componentsSecuritySchemes"></a> securitySchemes | Map[<code>string</code>, <a href="#securitySchemeObject">Security Scheme Object</a> \| <a href="#referenceObject">Reference Object</a>] | An object to hold reusable <a href="#securitySchemeObject">Security Scheme Objects</a>.
 <a name="componentsLinks"></a> links | Map[<code>string</code>, <a href="#linkObject">Link Object</a> \| <a href="#referenceObject">Reference Object</a>] | An object to hold reusable <a href="#linkObject">Link Objects</a>.
 <a name="componentsCallbacks"></a> callbacks | Map[<code>string</code>, <a href="#callbackObject">Callback Object</a> \| <a href="#referenceObject">Reference Object</a>] | An object to hold reusable <a href="#callbackObject">Callback Objects</a>.</p>
 <p>This object MAY be extended with <a href="#specificationExtensions">Specification Extensions</a>.</p>
@@ -574,7 +574,7 @@ The path itself is still exposed to the documentation viewer but they will not k
 <p>Field Name | Type | Description
 ---|:---:|---
 <a name="pathItemRef"></a>$ref | <code>string</code> | Allows for an external definition of this path item. The referenced structure MUST be in the format of a <a href="#pathItemObject">Path Item Object</a>. If there are conflicts between the referenced definition and this Path Item's definition, the behavior is <em>undefined</em>.
-<a name="pathItemSummary"></a>summary| <code>string</code> | An optional, string summary, intended to apply to all operations in this path.
+<a name="pathItemSummary"></a>summary | <code>string</code> | An optional, string summary, intended to apply to all operations in this path.
 <a name="pathItemDescription"></a>description | <code>string</code> | An optional, string description, intended to apply to all operations in this path. <a href="http://spec.commonmark.org/">CommonMark syntax</a> MAY be used for rich text representation.
 <a name="pathItemGet"></a>get | <a href="#operationObject">Operation Object</a> | A definition of a GET operation on this path.
 <a name="pathItemPut"></a>put | <a href="#operationObject">Operation Object</a> | A definition of a PUT operation on this path.
