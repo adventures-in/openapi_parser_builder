@@ -449,7 +449,7 @@ Field Name | Type | Description
 <a name="componentsExamples"></a> examples | Map[`string`, [Example Object](#exampleObject) \\| [Reference Object](#referenceObject)] | An object to hold reusable [Example Objects](#exampleObject).
 <a name="componentsRequestBodies"></a> requestBodies | Map[`string`, [Request Body Object](#requestBodyObject) \\| [Reference Object](#referenceObject)] | An object to hold reusable [Request Body Objects](#requestBodyObject).
 <a name="componentsHeaders"></a> headers | Map[`string`, [Header Object](#headerObject) \\| [Reference Object](#referenceObject)] | An object to hold reusable [Header Objects](#headerObject).
-<a name="componentsSecuritySchemes"></a> securitySchemes| Map[`string`, [Security Scheme Object](#securitySchemeObject) \\| [Reference Object](#referenceObject)] | An object to hold reusable [Security Scheme Objects](#securitySchemeObject).
+<a name="componentsSecuritySchemes"></a> securitySchemes | Map[`string`, [Security Scheme Object](#securitySchemeObject) \\| [Reference Object](#referenceObject)] | An object to hold reusable [Security Scheme Objects](#securitySchemeObject).
 <a name="componentsLinks"></a> links | Map[`string`, [Link Object](#linkObject) \\| [Reference Object](#referenceObject)] | An object to hold reusable [Link Objects](#linkObject).
 <a name="componentsCallbacks"></a> callbacks | Map[`string`, [Callback Object](#callbackObject) \\| [Reference Object](#referenceObject)] | An object to hold reusable [Callback Objects](#callbackObject).
 
@@ -711,7 +711,7 @@ The path itself is still exposed to the documentation viewer but they will not k
 Field Name | Type | Description
 ---|:---:|---
 <a name="pathItemRef"></a>$ref | `string` | Allows for an external definition of this path item. The referenced structure MUST be in the format of a [Path Item Object](#pathItemObject). If there are conflicts between the referenced definition and this Path Item's definition, the behavior is *undefined*.
-<a name="pathItemSummary"></a>summary| `string` | An optional, string summary, intended to apply to all operations in this path.
+<a name="pathItemSummary"></a>summary | `string` | An optional, string summary, intended to apply to all operations in this path.
 <a name="pathItemDescription"></a>description | `string` | An optional, string description, intended to apply to all operations in this path. [CommonMark syntax](http://spec.commonmark.org/) MAY be used for rich text representation.
 <a name="pathItemGet"></a>get | [Operation Object](#operationObject) | A definition of a GET operation on this path.
 <a name="pathItemPut"></a>put | [Operation Object](#operationObject) | A definition of a PUT operation on this path.
