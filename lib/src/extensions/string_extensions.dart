@@ -1,5 +1,6 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
+import 'package:openapi_client_builder_builder/src/enums/fields_type.dart';
 import 'package:openapi_client_builder_builder/src/schema_class_template.dart';
 
 extension StringExtension on String {
@@ -10,6 +11,7 @@ extension StringExtension on String {
     if (trimmedThis == 'string') return 'String';
     if (trimmedThis == 'boolean') return 'bool';
     if (trimmedThis == 'Any') return 'dynamic';
+    if (trimmedThis == '{expression}') return 'RuntimeExpression';
 
     // Convert any Map types found, recursively converting parameter types.
     if (trimmedThis.length > 4 && trimmedThis.substring(0, 4) == 'Map[') {
@@ -76,6 +78,7 @@ extension StringExtension on String {
 
       // Split up the table into rows and remove the formatting.
       list.add(SchemaClassTemplate(
+        fieldsType: nextTag.text.toFieldsType(),
         classNameTag: classNameTag,
         classCommentTags: classCommentTags,
         tableRows: tableTag.text.split('\n')..removeRange(0, 2),
@@ -83,5 +86,11 @@ extension StringExtension on String {
     }
 
     return list;
+  }
+
+  FieldsType toFieldsType() {
+    if (this == 'Fixed Fields') return FieldsType.fixed;
+    if (this == 'Patterned Fields') return FieldsType.patterned;
+    return FieldsType.unknown;
   }
 }

@@ -3,12 +3,15 @@ import 'package:openapi_client_builder_builder/src/extensions/string_extensions.
 /// Schema classes are created from the spec, this class holds the data used to
 /// construct the members of a schema class.
 class SchemaClassMember {
-  SchemaClassMember(this.comment, this.type, String name)
-      : _name = name.sanitize();
+  SchemaClassMember(this.isRequired, this.comment, String type, String name)
+      : _type = type,
+        _name = name.sanitize();
 
+  final bool isRequired;
   final String? comment;
-  final String type;
+  final String _type;
   final String _name;
 
+  String get type => isRequired ? _type : '$_type?';
   String get name => _name;
 }

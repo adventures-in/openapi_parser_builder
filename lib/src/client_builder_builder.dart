@@ -25,6 +25,14 @@ class ClientBuilderBuilder implements Builder {
       combinedOutput += template.output;
     }
 
+    combinedOutput += '''
+
+  /// 
+  class RuntimeExpression {
+    RuntimeExpression();
+  }
+''';
+
     await buildStep.writeAsString(outputId, combinedOutput);
   }
 

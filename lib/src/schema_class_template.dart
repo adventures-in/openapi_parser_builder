@@ -1,12 +1,15 @@
 import 'package:html/dom.dart';
+import 'package:openapi_client_builder_builder/src/enums/fields_type.dart';
 import 'package:openapi_client_builder_builder/src/schema_class_member.dart';
 import 'package:openapi_client_builder_builder/src/extensions/string_extensions.dart';
 
 class SchemaClassTemplate {
   SchemaClassTemplate(
-      {required Element classNameTag,
+      {required FieldsType fieldsType,
+      required Element classNameTag,
       required List<Element> classCommentTags,
       required List<String> tableRows}) {
+    _fieldsType = fieldsType;
     _classNameTag = classNameTag;
     _classCommentTags = classCommentTags;
 
@@ -25,14 +28,19 @@ class SchemaClassTemplate {
       if (rowParts.length > 2) {
         comment = rowParts.elementAt(2).trim();
       }
-      final member = SchemaClassMember(comment,
+      final isRequired = (comment != null &&
+          comment.length > 7 &&
+          comment.substring(0, 8) == 'REQUIRED');
+      final member = SchemaClassMember(isRequired, comment,
           rowParts.elementAt(1).trim().toDartType(), rowParts.first.trim());
 
       _classMembers.add(member);
     }
 
     _constructorString = _classMembers
-        .map<String>((member) => '${member.type}? ${member.name}')
+        .map<String>((member) =>
+            (member.isRequired ? 'required ' : '') +
+            '${member.type} ${member.name}')
         .join(', ');
 
     _initializerListString = _classMembers
@@ -41,15 +49,16 @@ class SchemaClassTemplate {
 
     _combinedClassMembersString = _classMembers
         .map<String>((member) =>
-            '  /// ${member.comment}\n  final ${member.type}? _${member.name};')
+            '  /// ${member.comment}\n  final ${member.type} _${member.name};')
         .join('\n');
 
     _gettersString = _classMembers
         .map<String>((member) =>
-            '  ${member.type}? get ${member.name} => _${member.name};')
+            '  ${member.type} get ${member.name} => _${member.name};')
         .join('\n');
   }
 
+  late final FieldsType _fieldsType;
   late final Element _classNameTag;
   late final List<Element> _classCommentTags;
   late final String _className;
