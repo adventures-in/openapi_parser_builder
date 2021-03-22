@@ -69,7 +69,16 @@ class SchemaClassTemplate {
   late final String _combinedClassMembersString;
   late final String _gettersString;
 
-  String get output => '''
+  String get output => _fieldsType == FieldsType.patterned
+      ? '''
+
+/// $_classComment
+class $_className {
+  $_className();
+}
+
+'''
+      : '''
 
 /// $_classComment
 class $_className {

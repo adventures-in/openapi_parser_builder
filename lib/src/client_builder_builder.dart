@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:build/build.dart';
 import 'package:markdown/markdown.dart';
 import 'package:openapi_client_builder_builder/src/extensions/string_extensions.dart';
+import 'package:openapi_client_builder_builder/src/state/union_types_set.dart';
 
 class ClientBuilderBuilder implements Builder {
   @override
@@ -32,6 +33,16 @@ class ClientBuilderBuilder implements Builder {
     RuntimeExpression();
   }
 ''';
+
+    for (final unionType in unionTypes) {
+      combinedOutput += '''
+
+  /// 
+  class $unionType {
+    $unionType();
+  }
+''';
+    }
 
     await buildStep.writeAsString(outputId, combinedOutput);
   }

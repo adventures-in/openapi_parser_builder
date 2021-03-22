@@ -2,6 +2,7 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:openapi_client_builder_builder/src/enums/fields_type.dart';
 import 'package:openapi_client_builder_builder/src/schema_class_template.dart';
+import 'package:openapi_client_builder_builder/src/state/union_types_set.dart';
 
 extension StringExtension on String {
   String toDartType() {
@@ -30,9 +31,11 @@ extension StringExtension on String {
     // Convert any Union types found.
     final unionObjects = trimmedThis.split(r' \| ');
     if (unionObjects.length == 2) {
-      return unionObjects.first.toDartType() +
+      final unionType = unionObjects.first.toDartType() +
           'Or' +
           unionObjects.last.toDartType();
+      unionTypes.add(unionType);
+      return unionType;
     }
 
     final objectWords = trimmedThis.split(' ');
@@ -44,6 +47,7 @@ extension StringExtension on String {
 
   String sanitize() {
     final trimmedThis = trim();
+    if (trimmedThis == 'in') return 'inValue';
     if (trimmedThis == 'enum') return 'enums';
     if (trimmedThis == 'default') return 'defaultValue';
     return this;
