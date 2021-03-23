@@ -40,6 +40,8 @@ class RuntimeExpression {
 /// 
 class $unionType {
   $unionType();
+
+  $unionType.fromJson(Map<String, dynamic> json);
 }
 ''';
     }

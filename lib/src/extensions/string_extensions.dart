@@ -26,14 +26,19 @@ extension StringExtension on String {
       final insideTypes = insideOfMap.split(', ');
       return MemberType(
           'Map<${insideTypes.first.toMemberType().value}, ${insideTypes.last.toMemberType().value}>',
-          TypeKind.map);
+          TypeKind.map,
+          parameterTypes: [
+            insideTypes.first.toMemberType(),
+            insideTypes.last.toMemberType()
+          ]);
     }
 
     // Convert any List types found, recursively converting parameter types.
     if (trimmedThis[0] == '[' && trimmedThis[length - 1] == ']') {
       var s = trimmedThis.replaceAll('[', '');
       s = s.replaceAll(']', '');
-      return MemberType('List<${s.toMemberType().value}>', TypeKind.list);
+      return MemberType('List<${s.toMemberType().value}>', TypeKind.list,
+          parameterTypes: [s.toMemberType()]);
     }
 
     // Convert any Union types found.

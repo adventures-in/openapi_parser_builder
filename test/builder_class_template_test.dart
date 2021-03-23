@@ -1,7 +1,7 @@
+import 'dart:io';
+
 import 'package:test/test.dart';
 import 'package:openapi_client_builder_builder/src/extensions/string_extensions.dart';
-
-import 'data/openapi_spec_html.dart';
 
 void main() {
   group('BuilderClassTemplate', () {
@@ -9,7 +9,9 @@ void main() {
       // awesome = Awesome();
     });
 
-    test('parses html correctly', () {
+    test('parses html correctly', () async {
+      final openapiSpecHTMLString =
+          await File('test/data/openapi_spec.html').readAsString();
       final templates = openapiSpecHTMLString.toTemplates();
 
       var combinedOutput = '';

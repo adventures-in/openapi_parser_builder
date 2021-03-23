@@ -25,6 +25,27 @@ class SchemaClassMember {
   String get name => _sanitizedName;
   String get rawName => _rawName;
 
+  // Strings for building fromJson for List types.
+  String get listParameter => _memberType.listParameter;
+  String get listParameterFromJson => (_memberType.listParamterIsObject)
+      ? '$listParameter.fromJson(json)'
+      : 'json[\'$name\']';
+  String get listCast => (_memberType.listParamterIsObject)
+      ? ' as List<dynamic>).map<$listParameter>((json) => $listParameterFromJson).toList()'
+      : '.cast<$listParameter>())';
+  // If the member is not a required member, add a null check to the fromJson
+  String get listNullCheck =>
+      (isRequired) ? '' : '== null) ? null : (json[\'$name\']';
+  String get objectNullCheck =>
+      (isRequired) ? '' : '(json[\'$name\'] == null) ? null :';
+
+  String get fromJsonString => (typeKind == TypeKind.object ||
+          typeKind == TypeKind.union)
+      ? '    _$name = $objectNullCheck $typeValueWithoutNullability.fromJson(json[\'$name\'])'
+      : typeKind == TypeKind.list
+          ? '    _$name = (json[\'$name\'] $listNullCheck$listCast'
+          : '    _$name = json[\'$name\']';
+
   String sanitize(String name) {
     final trimmed = name.trim();
     if (trimmed[0] == r'$') {

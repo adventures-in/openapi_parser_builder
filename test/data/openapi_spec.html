@@ -1,4 +1,3 @@
-final openapiSpecHTMLString = r'''
 <h1>OpenAPI Specification</h1>
 <h4>Version 3.0.1</h4>
 <p>The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be interpreted as described in <a href="https://tools.ietf.org/html/bcp14">BCP 14</a> <a href="https://tools.ietf.org/html/rfc2119">RFC2119</a> <a href="https://tools.ietf.org/html/rfc8174">RFC8174</a> when, and only when, they appear in all capitals, as shown here.</p>
@@ -514,7 +513,7 @@ The path is appended to the URL from the <a href="#serverObject"><code>Server Ob
 <h5>Patterned Fields</h5>
 <p>Field Pattern | Type | Description
 ---|:---:|---
-<a name="pathsPath"></a>/{path} | <a href="#pathItemObject">Path Item Object</a> | A relative path to an individual endpoint. The field name MUST begin with a slash. The path is <strong>appended</strong> (no relative URL resolution) to the expanded URL from the <a href="#serverObject"><code>Server Object</code></a>'s <code>url</code> field in order to construct the full URL. <a href="#pathTemplating">Path templating</a> is allowed. When matching URLs, concrete (non-templated) paths would be matched before their templated counterparts. Templated paths with the same hierarchy but different templated names MUST NOT exist as they are identical. In case of ambiguous matching, it's up to the tooling to decide which one to use.</p>
+<a name="pathsPath"></a>{path} | <a href="#pathItemObject">Path Item Object</a> | A relative path to an individual endpoint. The field name MUST begin with a slash. The path is <strong>appended</strong> (no relative URL resolution) to the expanded URL from the <a href="#serverObject"><code>Server Object</code></a>'s <code>url</code> field in order to construct the full URL. <a href="#pathTemplating">Path templating</a> is allowed. When matching URLs, concrete (non-templated) paths would be matched before their templated counterparts. Templated paths with the same hierarchy but different templated names MUST NOT exist as they are identical. In case of ambiguous matching, it's up to the tooling to decide which one to use.</p>
 <p>This object MAY be extended with <a href="#specificationExtensions">Specification Extensions</a>.</p>
 <h5>Path Templating Matching</h5>
 <p>Assuming the following paths, the concrete definition, <code>/pets/mine</code>, will be matched first if used:</p>
@@ -2747,4 +2746,3 @@ While not part of the specification itself, certain libraries MAY choose to allo
 1.2       | 2014-03-14 | Initial release of the formal document.
 1.1       | 2012-08-22 | Release of Swagger 1.1
 1.0       | 2011-08-10 | First release of the Swagger Specification</p>
-''';

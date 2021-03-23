@@ -2,7 +2,6 @@ import 'package:html/dom.dart';
 import 'package:openapi_client_builder_builder/src/enums/fields_type.dart';
 import 'package:openapi_client_builder_builder/src/schema_class_member.dart';
 import 'package:openapi_client_builder_builder/src/extensions/string_extensions.dart';
-import 'package:openapi_client_builder_builder/src/type_kind.dart';
 
 class SchemaClassTemplate {
   SchemaClassTemplate(
@@ -66,9 +65,7 @@ class SchemaClassTemplate {
     var fromJsonString =
         '  $_className.fromJson(Map<String, dynamic> json) :\n';
     fromJsonString += _classMembers
-        .map<String>((member) => member.typeKind == TypeKind.object
-            ? '    _${member.name} = ${member.typeValueWithoutNullability}.fromJson(json[\'${member.name}\'])'
-            : '    _${member.name} = json[\'${member.name}\']')
+        .map<String>((member) => member.fromJsonString)
         .join(',\n');
     fromJsonString += ';';
     _fromJsonString = fromJsonString;
