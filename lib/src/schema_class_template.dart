@@ -2,6 +2,7 @@ import 'package:html/dom.dart';
 import 'package:openapi_client_builder_builder/src/enums/fields_type.dart';
 import 'package:openapi_client_builder_builder/src/schema_class_member.dart';
 import 'package:openapi_client_builder_builder/src/extensions/string_extensions.dart';
+import 'package:openapi_client_builder_builder/src/type_kind.dart';
 
 class SchemaClassTemplate {
   SchemaClassTemplate(
@@ -32,7 +33,7 @@ class SchemaClassTemplate {
           comment.length > 7 &&
           comment.substring(0, 8) == 'REQUIRED');
       final member = SchemaClassMember(isRequired, comment,
-          rowParts.elementAt(1).trim().toDartType(), rowParts.first.trim());
+          rowParts.elementAt(1).trim().toMemberType(), rowParts.first.trim());
 
       _classMembers.add(member);
     }
@@ -40,22 +41,37 @@ class SchemaClassTemplate {
     _constructorString = _classMembers
         .map<String>((member) =>
             (member.isRequired ? 'required ' : '') +
-            '${member.type} ${member.name}')
+            '${member.typeValue} ${member.name}')
         .join(', ');
 
     _initializerListString = _classMembers
         .map<String>((member) => '_${member.name} = ${member.name}')
         .join(', ');
 
-    _combinedClassMembersString = _classMembers
-        .map<String>((member) =>
-            '  /// ${member.comment}\n  final ${member.type} _${member.name};')
-        .join('\n');
+    if (_fieldsType == FieldsType.patterned) {
+      _patternedMemberString =
+          _classMembers.first.name.replaceAll(RegExp(r'{|}'), '') + 'Map';
+    } else {
+      _combinedClassMembersString = _classMembers
+          .map<String>((member) =>
+              '  /// ${member.comment}\n  final ${member.typeValue} _${member.name};')
+          .join('\n');
+    }
 
     _gettersString = _classMembers
         .map<String>((member) =>
-            '  ${member.type} get ${member.name} => _${member.name};')
+            '  ${member.typeValue} get ${member.name} => _${member.name};')
         .join('\n');
+
+    var fromJsonString =
+        '  $_className.fromJson(Map<String, dynamic> json) :\n';
+    fromJsonString += _classMembers
+        .map<String>((member) => member.typeKind == TypeKind.object
+            ? '    _${member.name} = ${member.typeValueWithoutNullability}.fromJson(json[\'${member.name}\'])'
+            : '    _${member.name} = json[\'${member.name}\']')
+        .join(',\n');
+    fromJsonString += ';';
+    _fromJsonString = fromJsonString;
   }
 
   late final FieldsType _fieldsType;
@@ -67,7 +83,9 @@ class SchemaClassTemplate {
   late final String _constructorString;
   late final String _initializerListString;
   late final String _combinedClassMembersString;
+  late final String _patternedMemberString;
   late final String _gettersString;
+  late final String _fromJsonString;
 
   String get output => _fieldsType == FieldsType.patterned
       ? '''
@@ -75,6 +93,12 @@ class SchemaClassTemplate {
 /// $_classComment
 class $_className {
   $_className();
+
+  Map<String, PathItem> $_patternedMemberString = {};
+
+  $_className.fromJson(Map<String, dynamic> json) : 
+    $_patternedMemberString = {}..addEntries(json.entries.map(
+      (entry) => MapEntry(entry.key, PathItem.fromJson(entry.value))));
 }
 
 '''
@@ -87,6 +111,8 @@ class $_className {
 $_combinedClassMembersString
 
 $_gettersString
+
+$_fromJsonString
 }
 
 ''';

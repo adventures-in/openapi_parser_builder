@@ -29,18 +29,18 @@ class ClientBuilderBuilder implements Builder {
     combinedOutput += '''
 
   /// 
-  class RuntimeExpression {
-    RuntimeExpression();
-  }
+class RuntimeExpression {
+  RuntimeExpression();
+}
 ''';
 
     for (final unionType in unionTypes) {
       combinedOutput += '''
 
-  /// 
-  class $unionType {
-    $unionType();
-  }
+/// 
+class $unionType {
+  $unionType();
+}
 ''';
     }
 

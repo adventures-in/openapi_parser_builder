@@ -1,56 +1,60 @@
 import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:openapi_client_builder_builder/src/enums/fields_type.dart';
+import 'package:openapi_client_builder_builder/src/member_type.dart';
 import 'package:openapi_client_builder_builder/src/schema_class_template.dart';
 import 'package:openapi_client_builder_builder/src/state/union_types_set.dart';
+import 'package:openapi_client_builder_builder/src/type_kind.dart';
 
 extension StringExtension on String {
-  String toDartType() {
+  MemberType toMemberType() {
     final trimmedThis = trim();
 
     // Convert any simple types.
-    if (trimmedThis == 'string') return 'String';
-    if (trimmedThis == 'boolean') return 'bool';
-    if (trimmedThis == 'Any') return 'dynamic';
-    if (trimmedThis == '{expression}') return 'RuntimeExpression';
+    if (trimmedThis == 'string') {
+      return MemberType('String', TypeKind.primitive);
+    }
+    if (trimmedThis == 'boolean') return MemberType('bool', TypeKind.primitive);
+    if (trimmedThis == 'Any') return MemberType('dynamic', TypeKind.primitive);
+    if (trimmedThis == '{expression}') {
+      return MemberType('RuntimeExpression', TypeKind.object);
+    }
 
     // Convert any Map types found, recursively converting parameter types.
     if (trimmedThis.length > 4 && trimmedThis.substring(0, 4) == 'Map[') {
       final insideOfMap = trimmedThis.substring(4, trimmedThis.length - 1);
       final insideTypes = insideOfMap.split(', ');
-      return 'Map<${insideTypes.first.toDartType()}, ${insideTypes.last.toDartType()}>';
+      return MemberType(
+          'Map<${insideTypes.first.toMemberType().value}, ${insideTypes.last.toMemberType().value}>',
+          TypeKind.map);
     }
 
     // Convert any List types found, recursively converting parameter types.
     if (trimmedThis[0] == '[' && trimmedThis[length - 1] == ']') {
       var s = trimmedThis.replaceAll('[', '');
       s = s.replaceAll(']', '');
-      return 'List<${s.toDartType()}>';
+      return MemberType('List<${s.toMemberType().value}>', TypeKind.list);
     }
 
     // Convert any Union types found.
     final unionObjects = trimmedThis.split(r' \| ');
     if (unionObjects.length == 2) {
-      final unionType = unionObjects.first.toDartType() +
+      final unionType = unionObjects.first.toMemberType().value +
           'Or' +
-          unionObjects.last.toDartType();
+          unionObjects.last.toMemberType().value;
       unionTypes.add(unionType);
-      return unionType;
+      return MemberType(unionType, TypeKind.union);
     }
 
+    // Convert any Object types.
     final objectWords = trimmedThis.split(' ');
     if (objectWords.last == 'Object') {
-      return (trimmedThis.split(' ')..removeLast()).join();
+      return MemberType(
+          (trimmedThis.split(' ')..removeLast()).join(), TypeKind.object);
     }
-    return '/// __${this}__';
-  }
 
-  String sanitize() {
-    final trimmedThis = trim();
-    if (trimmedThis == 'in') return 'inValue';
-    if (trimmedThis == 'enum') return 'enums';
-    if (trimmedThis == 'default') return 'defaultValue';
-    return this;
+    // If nothing was found, return an unkown type.
+    return MemberType('/// __${this}__', TypeKind.unknown);
   }
 
   List<SchemaClassTemplate> toTemplates() {
