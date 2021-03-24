@@ -39,12 +39,20 @@ class SchemaClassMember {
   String get objectNullCheck =>
       (isRequired) ? '' : '(json[\'$name\'] == null) ? null :';
 
+  // Strings for building fromJson for List types.
+  String get mapParameter => _memberType.mapParameter;
+  String get mapCast => (_memberType.listParamterIsObject)
+      ? '.map<String, $mapParameter>((entry) => entry)'
+      : '.cast<String, $mapParameter>())';
+
   String get fromJsonString => (typeKind == TypeKind.object ||
           typeKind == TypeKind.union)
       ? '    _$name = $objectNullCheck $typeValueWithoutNullability.fromJson(json[\'$name\'])'
       : typeKind == TypeKind.list
           ? '    _$name = (json[\'$name\'] $listNullCheck$listCast'
-          : '    _$name = json[\'$name\']';
+          : typeKind == TypeKind.map
+              ? '    _$name = (json[\'$name\'] $listNullCheck$mapCast'
+              : '    _$name = json[\'$name\']';
 
   String sanitize(String name) {
     final trimmed = name.trim();

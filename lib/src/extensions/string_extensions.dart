@@ -7,61 +7,6 @@ import 'package:openapi_client_builder_builder/src/state/union_types_set.dart';
 import 'package:openapi_client_builder_builder/src/type_kind.dart';
 
 extension StringExtension on String {
-  MemberType toMemberType() {
-    final trimmedThis = trim();
-
-    // Convert any simple types.
-    if (trimmedThis == 'string') {
-      return MemberType('String', TypeKind.primitive);
-    }
-    if (trimmedThis == 'boolean') return MemberType('bool', TypeKind.primitive);
-    if (trimmedThis == 'Any') return MemberType('dynamic', TypeKind.primitive);
-    if (trimmedThis == '{expression}') {
-      return MemberType('RuntimeExpression', TypeKind.object);
-    }
-
-    // Convert any Map types found, recursively converting parameter types.
-    if (trimmedThis.length > 4 && trimmedThis.substring(0, 4) == 'Map[') {
-      final insideOfMap = trimmedThis.substring(4, trimmedThis.length - 1);
-      final insideTypes = insideOfMap.split(', ');
-      return MemberType(
-          'Map<${insideTypes.first.toMemberType().value}, ${insideTypes.last.toMemberType().value}>',
-          TypeKind.map,
-          parameterTypes: [
-            insideTypes.first.toMemberType(),
-            insideTypes.last.toMemberType()
-          ]);
-    }
-
-    // Convert any List types found, recursively converting parameter types.
-    if (trimmedThis[0] == '[' && trimmedThis[length - 1] == ']') {
-      var s = trimmedThis.replaceAll('[', '');
-      s = s.replaceAll(']', '');
-      return MemberType('List<${s.toMemberType().value}>', TypeKind.list,
-          parameterTypes: [s.toMemberType()]);
-    }
-
-    // Convert any Union types found.
-    final unionObjects = trimmedThis.split(r' \| ');
-    if (unionObjects.length == 2) {
-      final unionType = unionObjects.first.toMemberType().value +
-          'Or' +
-          unionObjects.last.toMemberType().value;
-      unionTypes.add(unionType);
-      return MemberType(unionType, TypeKind.union);
-    }
-
-    // Convert any Object types.
-    final objectWords = trimmedThis.split(' ');
-    if (objectWords.last == 'Object') {
-      return MemberType(
-          (trimmedThis.split(' ')..removeLast()).join(), TypeKind.object);
-    }
-
-    // If nothing was found, return an unkown type.
-    return MemberType('/// __${this}__', TypeKind.unknown);
-  }
-
   List<SchemaClassTemplate> toTemplates() {
     final list = <SchemaClassTemplate>[];
 
@@ -99,6 +44,64 @@ extension StringExtension on String {
     }
 
     return list;
+  }
+
+  MemberType toMemberType() {
+    final trimmedThis = trim();
+
+    // Convert any simple types.
+    if (trimmedThis == 'string') {
+      return MemberType('String', TypeKind.primitive);
+    }
+    if (trimmedThis == 'boolean') return MemberType('bool', TypeKind.primitive);
+    if (trimmedThis == 'Any') return MemberType('dynamic', TypeKind.primitive);
+    if (trimmedThis == '{expression}') {
+      return MemberType('RuntimeExpression', TypeKind.object);
+    }
+
+    // Convert any Map types found, recursively converting parameter types.
+    if (trimmedThis.length > 4 && trimmedThis.substring(0, 4) == 'Map[') {
+      final insideOfMap = trimmedThis.substring(4, trimmedThis.length - 1);
+      final insideTypes = insideOfMap.split(', ');
+      if (insideTypes.length != 2) {
+        throw 'Constructing MemberType: $trimmedThis had type Map but ${insideTypes.length} paramters.';
+      }
+      return MemberType(
+          'Map<${insideTypes.first.toMemberType().value}, ${insideTypes.last.toMemberType().value}>',
+          TypeKind.map,
+          parameterTypes: [
+            insideTypes.first.toMemberType(),
+            insideTypes.last.toMemberType()
+          ]);
+    }
+
+    // Convert any List types found, recursively converting parameter types.
+    if (trimmedThis[0] == '[' && trimmedThis[length - 1] == ']') {
+      var s = trimmedThis.replaceAll('[', '');
+      s = s.replaceAll(']', '');
+      return MemberType('List<${s.toMemberType().value}>', TypeKind.list,
+          parameterTypes: [s.toMemberType()]);
+    }
+
+    // Convert any Union types found.
+    final unionObjects = trimmedThis.split(r' \| ');
+    if (unionObjects.length == 2) {
+      final unionType = unionObjects.first.toMemberType().value +
+          'Or' +
+          unionObjects.last.toMemberType().value;
+      unionTypes.add(unionType);
+      return MemberType(unionType, TypeKind.union);
+    }
+
+    // Convert any Object types.
+    final objectWords = trimmedThis.split(' ');
+    if (objectWords.last == 'Object') {
+      return MemberType(
+          (trimmedThis.split(' ')..removeLast()).join(), TypeKind.object);
+    }
+
+    // If nothing was found, return an unkown type.
+    return MemberType('/// __${this}__', TypeKind.unknown);
   }
 
   FieldsType toFieldsType() {

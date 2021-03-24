@@ -11,4 +11,7 @@ class MemberType {
   String get listParameter => _parameterTypes.first.value;
   bool get listParamterIsObject =>
       _parameterTypes.first.kind == TypeKind.object;
+
+  String get mapParameter => _parameterTypes.last.value;
+  bool get mapParamterIsObject => _parameterTypes.last.kind == TypeKind.object;
 }
