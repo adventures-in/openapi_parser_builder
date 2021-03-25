@@ -1,29 +1,35 @@
 import 'package:openapi_client_builder/src/schema/types/member_type.dart';
 import 'package:openapi_client_builder/src/enums/type_category.dart';
+import 'package:openapi_client_builder/src/extensions/list_extensions.dart';
 
 /// Schema classes are created from the spec, this class holds the data used to
 /// construct the members of a schema class.
 class MemberTemplate {
-  MemberTemplate(
-      this.isRequired, this.comment, MemberType memberType, String name)
-      : _memberType = memberType,
-        _rawName = name {
-    _sanitizedName = sanitize(name);
+  MemberTemplate(String tableRow) {
+    final rowParts = tableRow.split(' | ');
+    _comment = rowParts.elementAtOrNull(2)?.trim();
+    _isRequired = _comment?.startsWith('REQUIRED') == true;
+    _memberType = MemberType.from(rowParts.elementAt(1).trim());
+    _rawName = rowParts.first.trim();
+    _sanitizedName = sanitize(_rawName);
   }
 
-  final bool isRequired;
-  late final bool isReference;
-  final String? comment;
-  final MemberType _memberType;
-  final String _rawName;
+  late final bool _isRequired;
+  late final bool _isReference;
+  late final String? _comment;
+  late final MemberType _memberType;
+  late final String _rawName;
   late final String _sanitizedName;
 
   TypeCategory get typeCategory => _memberType.category;
   String get typeValue =>
-      isRequired ? _memberType.value : '${_memberType.value}?';
+      _isRequired ? _memberType.value : '${_memberType.value}?';
   String get typeValueWithoutNullability => _memberType.value;
   String get name => _sanitizedName;
   String get rawName => _rawName;
+  String? get comment => _comment;
+
+  bool get isRequired => _isRequired;
 
   // Strings for building fromJson for List types.
   String get listParameter => _memberType.listParameter.value;
@@ -35,9 +41,9 @@ class MemberTemplate {
       : '.cast<$listParameter>())';
   // If the member is not a required member, add a null check to the fromJson
   String get listNullCheck =>
-      (isRequired) ? '' : '== null) ? null : (json[\'$name\']';
+      (_isRequired) ? '' : '== null) ? null : (json[\'$name\']';
   String get objectNullCheck =>
-      (isRequired) ? '' : '(json[\'$name\'] == null) ? null :';
+      (_isRequired) ? '' : '(json[\'$name\'] == null) ? null :';
 
   // Strings for building fromJson for List types.
   String get mapParameter => _memberType.mapParameter.value;
@@ -68,10 +74,10 @@ class MemberTemplate {
   String sanitize(String name) {
     final trimmed = name.trim();
     if (trimmed[0] == r'$') {
-      isReference = true;
+      _isReference = true;
       return trimmed.substring(1);
     } else {
-      isReference = false;
+      _isReference = false;
     }
     if (trimmed == 'in') return 'inValue';
     if (trimmed == 'enum') return 'enums';

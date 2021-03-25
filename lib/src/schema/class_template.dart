@@ -1,42 +1,30 @@
 import 'package:html/dom.dart';
 import 'package:openapi_client_builder/src/enums/fields_type.dart';
 import 'package:openapi_client_builder/src/schema/member_template.dart';
-import 'package:openapi_client_builder/src/schema/types/member_type.dart';
+import 'package:openapi_client_builder/src/extensions/list_of_element_extensions.dart';
 
+/// The first pass of parsing the spec document has produced a set data items,
+/// each corresponding to a schema that we want a class template for.
+///
+/// We convert the data to something we can use in a class template by:
+///   - remove spaces and 'Object' from the class name
+///   - add /// between tags and after each newline for multiline comments
 class ClassTemplate {
   ClassTemplate(
       {required FieldsType fieldsType,
       required Element classNameTag,
       required List<Element> classCommentTags,
-      required List<String> tableRows}) {
-    _fieldsType = fieldsType;
-    _classNameTag = classNameTag;
-    _classCommentTags = classCommentTags;
+      required List<String> tableRows})
+      : _fieldsType = fieldsType,
+        _className = (classNameTag.text.split(' ')..removeLast()).join(),
+        _classComment = classCommentTags.toCommentsString() {
+    //
+    // Create class members by parsing the spec table.
 
-    // Remove spaces and 'Object' from the class name
-    _className = (_classNameTag.text.split(' ')..removeLast()).join();
+    _classMembers =
+        tableRows.map<MemberTemplate>((row) => MemberTemplate(row)).toList();
 
-    // Add /// between tags and after each newline for multiline comments
-    _classComment = _classCommentTags
-        .map<String>((tag) => tag.text.replaceAll('\n', '\n/// '))
-        .join('\n/// ');
-
-    // Iterate over class members, parsing each in turn.
-    for (final row in tableRows) {
-      final rowParts = row.split(' | ');
-      String? comment;
-      if (rowParts.length > 2) {
-        comment = rowParts.elementAt(2).trim();
-      }
-      final isRequired = (comment != null &&
-          comment.length > 7 &&
-          comment.substring(0, 8) == 'REQUIRED');
-      final member = MemberTemplate(isRequired, comment,
-          MemberType.from(rowParts.elementAt(1).trim()), rowParts.first.trim());
-
-      _classMembers.add(member);
-    }
-
+    // Iterate over members, creating parts of the class template.
     _constructorString = _classMembers
         .map<String>((member) =>
             (member.isRequired ? 'required ' : '') +
@@ -72,11 +60,9 @@ class ClassTemplate {
   }
 
   late final FieldsType _fieldsType;
-  late final Element _classNameTag;
-  late final List<Element> _classCommentTags;
   late final String _className;
   late final String _classComment;
-  final List<MemberTemplate> _classMembers = [];
+  late final List<MemberTemplate> _classMembers;
   late final String _constructorString;
   late final String _initializerListString;
   late final String _combinedClassMembersString;

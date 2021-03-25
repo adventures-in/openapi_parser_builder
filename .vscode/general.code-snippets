@@ -1,0 +1,7 @@
+{
+  "extension_import": {
+    "scope": "dart",
+    "prefix": "extension_import",
+    "body": "import 'package:$WORKSPACE_NAME/src/extensions$0';"
+  }
+}
