@@ -2,6 +2,7 @@ import 'package:html/dom.dart';
 import 'package:openapi_client_builder/src/enums/fields_type.dart';
 import 'package:openapi_client_builder/src/schema/member_template.dart';
 import 'package:openapi_client_builder/src/extensions/list_of_element_extensions.dart';
+import 'package:openapi_client_builder/src/extensions/list_of_member_template_extension.dart';
 
 /// The first pass of parsing the spec document has produced a set data items,
 /// each corresponding to a schema that we want a class template for.
@@ -25,15 +26,9 @@ class ClassTemplate {
         tableRows.map<MemberTemplate>((row) => MemberTemplate(row)).toList();
 
     // Iterate over members, creating parts of the class template.
-    _constructorString = _classMembers
-        .map<String>((member) =>
-            (member.isRequired ? 'required ' : '') +
-            '${member.typeValue} ${member.name}')
-        .join(', ');
 
-    _initializerListString = _classMembers
-        .map<String>((member) => '_${member.name} = ${member.name}')
-        .join(', ');
+    _constructorString = _classMembers.toConstructorString();
+    _initializersString = _classMembers.toInilitializersString();
 
     if (_fieldsType == FieldsType.patterned) {
       _patternedMemberString =
@@ -64,7 +59,7 @@ class ClassTemplate {
   late final String _classComment;
   late final List<MemberTemplate> _classMembers;
   late final String _constructorString;
-  late final String _initializerListString;
+  late final String _initializersString;
   late final String _combinedClassMembersString;
   late final String _patternedMemberString;
   late final String _gettersString;
@@ -89,7 +84,7 @@ class $_className {
 
 /// $_classComment
 class $_className {
-  $_className({$_constructorString}) : $_initializerListString;
+  $_className({$_constructorString}) : $_initializersString;
 
 $_combinedClassMembersString
 
