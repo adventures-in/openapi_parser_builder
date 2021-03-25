@@ -3,6 +3,7 @@ import 'package:openapi_client_builder/src/enums/fields_type.dart';
 import 'package:openapi_client_builder/src/schema/class_template.dart';
 import 'package:openapi_client_builder/src/extensions/string_extensions.dart';
 import 'package:openapi_client_builder/src/schema/class_template_patterned.dart';
+import 'package:openapi_client_builder/src/extensions/element_extensions.dart';
 
 List<ClassTemplate> extractClassTemplates(Document document) {
   final list = <ClassTemplate>[];
@@ -15,22 +16,21 @@ List<ClassTemplate> extractClassTemplates(Document document) {
     // Move to the next sibling till we get a h5 tag
     var classCommentTags = <Element>[];
     var nextTag = classNameTag.nextElementSibling;
-    while (nextTag != null &&
-        nextTag.text != 'Fixed Fields' &&
-        nextTag.text != 'Patterned Fields') {
-      // nextTag.localName != 'h5'
+    while (nextTag != null && nextTag.isNotTableHeader) {
+      // Keep adding to the commentTags and moving on.
       classCommentTags.add(nextTag);
       nextTag = nextTag.nextElementSibling;
     }
 
-    // If we don't have the right subheading, this is not a schema item.
-    if (nextTag == null) continue;
+    // Get the rest of the info.
+    final isFixedFields = nextTag?.text.toFieldsType() == FieldsType.fixed;
+    final tableTag = nextTag?.nextElementSibling;
 
-    final tableTag = nextTag.nextElementSibling;
+    // If we don't have a table, this is not a schema item.
     if (tableTag == null || tableTag.text.split('\n').length < 3) continue;
 
     // Split up the table into rows and remove the formatting.
-    list.add((nextTag.text.toFieldsType() == FieldsType.fixed
+    list.add((isFixedFields
         ? ClassTemplate(
             classNameTag: classNameTag,
             classCommentTags: classCommentTags,

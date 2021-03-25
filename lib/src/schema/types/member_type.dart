@@ -3,10 +3,10 @@ import 'package:openapi_client_builder/src/schema/types/union_type.dart';
 import 'package:openapi_client_builder/src/state/global_set_of_union_types.dart';
 
 class MemberType {
-  MemberType(this.value, this.category, {List<MemberType>? parameterTypes})
+  MemberType(this.name, this.category, {List<MemberType>? parameterTypes})
       : _parameterTypes = (parameterTypes == null) ? [] : parameterTypes;
 
-  String value;
+  String name;
   TypeCategory category;
 
   final List<MemberType> _parameterTypes;
@@ -36,7 +36,7 @@ class MemberType {
         throw 'Constructing MemberType: $trimmed had type Map but ${insideTypes.length} paramters.';
       }
       return MemberType(
-          'Map<${MemberType.from(insideTypes.first).value}, ${MemberType.from(insideTypes.last).value}>',
+          'Map<${MemberType.from(insideTypes.first).name}, ${MemberType.from(insideTypes.last).name}>',
           TypeCategory.map,
           parameterTypes: [
             MemberType.from(insideTypes.first),
@@ -48,7 +48,7 @@ class MemberType {
     if (trimmed[0] == '[' && trimmed[trimmed.length - 1] == ']') {
       var s = trimmed.replaceAll('[', '');
       s = s.replaceAll(']', '');
-      return MemberType('List<${MemberType.from(s).value}>', TypeCategory.list,
+      return MemberType('List<${MemberType.from(s).name}>', TypeCategory.list,
           parameterTypes: [MemberType.from(s)]);
     }
 
@@ -58,7 +58,7 @@ class MemberType {
       final firstParameterType = MemberType.from(unionObjects.first);
       final secondParameterType = MemberType.from(unionObjects.last);
       final unionType = UnionType(
-          '${firstParameterType.value}Or${secondParameterType.value}',
+          '${firstParameterType.name}Or${secondParameterType.name}',
           parameterTypes: [firstParameterType, secondParameterType]);
       globalSetOfUnionTypes.add(unionType);
       return unionType;
@@ -79,17 +79,24 @@ class MemberType {
   MemberType get mapParameter => _parameterTypes.last;
   MemberType get firstParameter => _parameterTypes.first;
   MemberType get secondParameter => _parameterTypes.last;
+
   bool get isObject => category == TypeCategory.object;
+  bool get isList => category == TypeCategory.list;
+  bool get isMap => category == TypeCategory.map;
+  bool get isUnion => category == TypeCategory.union;
+  bool get isObjectOrUnion =>
+      category == TypeCategory.object || category == TypeCategory.union;
+
   String get variableName => (category == TypeCategory.any)
       ? 'any'
-      : value[0].toLowerCase() + value.substring(1);
+      : name[0].toLowerCase() + name.substring(1);
 
   // We want state based equivalence so Set behaves as expected. The value
   // eg. String or CallbackOrReference, uniquely identifies the MemberType
 
   @override
-  bool operator ==(o) => o is MemberType && o.value == value;
+  bool operator ==(o) => o is MemberType && o.name == name;
 
   @override
-  int get hashCode => value.hashCode;
+  int get hashCode => name.hashCode;
 }
