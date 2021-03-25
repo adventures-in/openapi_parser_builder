@@ -5,8 +5,8 @@ class UnionType extends MemberType {
   UnionType(String value, {List<MemberType>? parameterTypes})
       : firstVariableName = parameterTypes!.first.variableName,
         secondVariableName = parameterTypes.last.variableName,
-        firstClassName = parameterTypes.first.value,
-        secondClassName = parameterTypes.last.value,
+        firstClassName = parameterTypes.first.name,
+        secondClassName = parameterTypes.last.name,
         super(value, TypeCategory.union, parameterTypes: parameterTypes) {
     ;
   }
@@ -19,13 +19,13 @@ class UnionType extends MemberType {
   String get classTemplate => '''
 
 ///
-class $value {
-  $value(this.$firstVariableName, this.$secondVariableName);
+class $name {
+  $name(this.$firstVariableName, this.$secondVariableName);
 
   $firstClassName? $firstVariableName;
   $secondClassName? $secondVariableName;
 
-  $value.fromJson(Map<String, dynamic> json) :
+  $name.fromJson(Map<String, dynamic> json) :
     $firstVariableName = (json[\'$firstVariableName}\'] == null) ? null : $firstClassName.fromJson(json[\'$firstVariableName\']),
     $secondVariableName = (json[\'\\\$ref\'] == null) ? null : $secondClassName.fromJson(json[\'\\\$ref\']);
 }

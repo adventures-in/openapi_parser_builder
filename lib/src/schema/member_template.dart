@@ -1,5 +1,4 @@
 import 'package:openapi_client_builder/src/schema/types/member_type.dart';
-import 'package:openapi_client_builder/src/enums/type_category.dart';
 import 'package:openapi_client_builder/src/extensions/list_extensions.dart';
 
 /// Schema classes are created from the spec, this class holds the data used to
@@ -15,57 +14,56 @@ class MemberTemplate {
   }
 
   late final bool _isRequired;
-  late final bool _isReference;
+  late final bool _isReference; // references may need to use ref or $ref
   late final String? _comment;
   late final MemberType _memberType;
   late final String _rawName;
   late final String _sanitizedName;
 
-  TypeCategory get typeCategory => _memberType.category;
-  String get typeValue =>
-      _isRequired ? _memberType.value : '${_memberType.value}?';
-  String get typeValueWithoutNullability => _memberType.value;
+  String get typeName =>
+      _isRequired ? _memberType.name : '${_memberType.name}?';
+  String get rawTypeName => _memberType.name;
   String get name => _sanitizedName;
   String get rawName => _rawName;
   String? get comment => _comment;
 
   bool get isRequired => _isRequired;
+  bool get isReference => _isReference;
 
   // Strings for building fromJson for List types.
-  String get listParameter => _memberType.listParameter.value;
-  String get listParameterFromJson => (_memberType.listParameter.isObject)
-      ? '$listParameter.fromJson(json)'
-      : 'json[\'$name\']';
-  String get listCast => (_memberType.listParameter.isObject)
-      ? ' as List<dynamic>).map<$listParameter>((json) => $listParameterFromJson).toList()'
-      : '.cast<$listParameter>())';
+  String get listParameter => _memberType.listParameter.name;
+  String get listFrom => (_memberType.listParameter.isObjectOrUnion)
+      ? 'json[\'$name\'].map<$listParameter>((item) => $listParameter.fromJson(item)).toList()'
+      : 'json[\'$name\'].map<$listParameter>((item) => item as $listParameter).toList()';
   // If the member is not a required member, add a null check to the fromJson
-  String get listNullCheck =>
+  String get mapNullCheck =>
       (_isRequired) ? '' : '== null) ? null : (json[\'$name\']';
   String get objectNullCheck =>
       (_isRequired) ? '' : '(json[\'$name\'] == null) ? null :';
 
   // Strings for building fromJson for List types.
-  String get mapParameter => _memberType.mapParameter.value;
-  String get mapCast => (_memberType.listParameter.isObject)
-      ? '.map<String, $mapParameter>((entry) => entry)'
-      : '.cast<String, $mapParameter>())';
+  String get mapParameter => _memberType.mapParameter.name;
+  String get mapFrom => (_memberType.mapParameter.isObjectOrUnion)
+      ? 'as Map<String, dynamic>).map<String, $mapParameter>((key, value) => MapEntry(key, $mapParameter.fromJson(value))'
+      : 'as Map<String, dynamic>).map<String, $mapParameter>((key, value) => MapEntry(key, value as $mapParameter)';
 
-  String get firstParameter => _memberType.firstParameter.value;
-  String get secondParameter => _memberType.secondParameter.value;
+  // _content = (json['content']  as Map<String, dynamic>).map<String, MediaType>((key, value) => MapEntry(key, MediaType.fromJson(value)))),
+  // _callbacks = (json['callbacks'] == null) ? null : ((json['callbacks'] as Map<String, dynamic>).map<String, CallbackOrReference>((key, value) => MapEntry(key, CallbackOrReference.fromJson(value)))),
+
+  String get firstParameter => _memberType.firstParameter.name;
+  String get secondParameter => _memberType.secondParameter.name;
 
   String get fromJsonString {
-    if (typeCategory == TypeCategory.object ||
-        typeCategory == TypeCategory.union) {
-      return '    _$name = $objectNullCheck $typeValueWithoutNullability.fromJson(json[\'$name\'])';
+    if (_memberType.isObjectOrUnion) {
+      return '    _$name = $objectNullCheck $rawTypeName.fromJson(json[\'$name\'])';
     }
 
-    if (typeCategory == TypeCategory.list) {
-      return '    _$name = (json[\'$name\'] $listNullCheck$listCast';
+    if (_memberType.isList) {
+      return '    _$name = $objectNullCheck $listFrom';
     }
 
-    if (typeCategory == TypeCategory.map) {
-      '    _$name = (json[\'$name\'] $listNullCheck$mapCast';
+    if (_memberType.isMap) {
+      return '    _$name = (json[\'$name\'] $mapNullCheck $mapFrom)';
     }
 
     return '    _$name = json[\'$name\']';

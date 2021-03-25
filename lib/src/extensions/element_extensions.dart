@@ -6,4 +6,7 @@ extension ElementExtension on Element {
       (text.split('\n')..removeRange(0, 2))
           .map<MemberTemplate>((row) => MemberTemplate(row))
           .toList();
+
+  bool get isNotTableHeader =>
+      text != 'Fixed Fields' && text != 'Patterned Fields';
 }
