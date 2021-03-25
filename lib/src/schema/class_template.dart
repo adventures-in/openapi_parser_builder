@@ -1,8 +1,8 @@
 import 'package:html/dom.dart';
-import 'package:openapi_client_builder/src/enums/fields_type.dart';
 import 'package:openapi_client_builder/src/schema/member_template.dart';
 import 'package:openapi_client_builder/src/extensions/list_of_element_extensions.dart';
 import 'package:openapi_client_builder/src/extensions/list_of_member_template_extension.dart';
+import 'package:openapi_client_builder/src/extensions/element_extensions.dart';
 
 /// The first pass of parsing the spec document has produced a set data items,
 /// each corresponding to a schema that we want a class template for.
@@ -12,81 +12,49 @@ import 'package:openapi_client_builder/src/extensions/list_of_member_template_ex
 ///   - add /// between tags and after each newline for multiline comments
 class ClassTemplate {
   ClassTemplate(
-      {required FieldsType fieldsType,
-      required Element classNameTag,
+      {required Element classNameTag,
       required List<Element> classCommentTags,
-      required List<String> tableRows})
-      : _fieldsType = fieldsType,
-        _className = (classNameTag.text.split(' ')..removeLast()).join(),
+      required Element tableTag})
+      : _className = (classNameTag.text.split(' ')..removeLast()).join(),
         _classComment = classCommentTags.toCommentsString() {
     //
     // Create class members by parsing the spec table.
 
-    _classMembers =
-        tableRows.map<MemberTemplate>((row) => MemberTemplate(row)).toList();
+    _classMembers = tableTag.toMemberTemplates();
 
     // Iterate over members, creating parts of the class template.
 
     _constructorString = _classMembers.toConstructorString();
     _initializersString = _classMembers.toInilitializersString();
+    _gettersString = _classMembers.toGettersString();
+    _memberDeclarationsString = _classMembers.toDeclarationsString();
 
-    if (_fieldsType == FieldsType.patterned) {
-      _patternedMemberString =
-          _classMembers.first.name.replaceAll(RegExp(r'{|}'), '') + 'Map';
-    } else {
-      _combinedClassMembersString = _classMembers
-          .map<String>((member) =>
-              '  /// ${member.comment}\n  final ${member.typeValue} _${member.name};')
-          .join('\n');
-    }
-
-    _gettersString = _classMembers
-        .map<String>((member) =>
-            '  ${member.typeValue} get ${member.name} => _${member.name};')
-        .join('\n');
-
-    var fromJsonString =
-        '  $_className.fromJson(Map<String, dynamic> json) :\n';
-    fromJsonString += _classMembers
-        .map<String>((member) => member.fromJsonString)
-        .join(',\n');
-    fromJsonString += ';';
-    _fromJsonString = fromJsonString;
+    _fromJsonString = '''
+  $_className.fromJson(Map<String, dynamic> json) :
+${_classMembers.toInitializersForFromJson()};
+    ''';
   }
 
-  late final FieldsType _fieldsType;
   late final String _className;
   late final String _classComment;
   late final List<MemberTemplate> _classMembers;
   late final String _constructorString;
   late final String _initializersString;
-  late final String _combinedClassMembersString;
-  late final String _patternedMemberString;
+  late final String _memberDeclarationsString;
   late final String _gettersString;
   late final String _fromJsonString;
 
-  String get output => _fieldsType == FieldsType.patterned
-      ? '''
+  String get classComment => _classComment;
+  String get className => _className;
+  String get firstMemberName => _classMembers.first.name;
 
-/// $_classComment
-class $_className {
-  $_className();
-
-  Map<String, PathItem> $_patternedMemberString = {};
-
-  $_className.fromJson(Map<String, dynamic> json) : 
-    $_patternedMemberString = {}..addEntries(json.entries.map(
-      (entry) => MapEntry(entry.key, PathItem.fromJson(entry.value))));
-}
-
-'''
-      : '''
+  String get output => '''
 
 /// $_classComment
 class $_className {
   $_className({$_constructorString}) : $_initializersString;
 
-$_combinedClassMembersString
+$_memberDeclarationsString
 
 $_gettersString
 
