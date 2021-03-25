@@ -1,0 +1,13 @@
+{ 
+  "requestBody" : {
+    "description" : "AgeRatingDeclaration representation",
+    "content" : {
+      "application/json" : {
+        "schema" : {
+          "$ref" : "#/components/schemas/AgeRatingDeclarationUpdateRequest"
+        }
+      }
+    },
+    "required" : true
+  }
+}

@@ -1,11 +1,12 @@
 import 'dart:async';
 
 import 'package:build/build.dart';
+import 'package:html/parser.dart';
 import 'package:markdown/markdown.dart';
-import 'package:openapi_client_builder_builder/src/extensions/string_extensions.dart';
-import 'package:openapi_client_builder_builder/src/state/union_types_set.dart';
+import 'package:openapi_client_builder/src/schema/utility_functions.dart';
+import 'package:openapi_client_builder/src/state/global_set_of_union_types.dart';
 
-class ClientBuilderBuilder implements Builder {
+class ClientBuilder implements Builder {
   @override
   FutureOr<void> build(BuildStep buildStep) async {
     final inputId = buildStep.inputId;
@@ -15,11 +16,10 @@ class ClientBuilderBuilder implements Builder {
 
     final outputId = AssetId(inputId.package, newPath);
 
-    final contents = await buildStep.readAsString(inputId);
+    final openapiSpecREADME = await buildStep.readAsString(inputId);
 
-    final html = markdownToHtml(contents);
-
-    final templates = html.toTemplates();
+    final templates =
+        extractClassTemplates(parse(markdownToHtml(openapiSpecREADME)));
 
     var combinedOutput = '';
     for (final template in templates) {
@@ -27,23 +27,24 @@ class ClientBuilderBuilder implements Builder {
     }
 
     combinedOutput += '''
-
-  /// 
+ 
 class RuntimeExpression {
-  RuntimeExpression();
+  RuntimeExpression(this.expression);
+
+  String expression;
+
+  RuntimeExpression.fromJson(Map<String, dynamic> json) : expression = json as String;
+}
+
+class Any {
+  dynamic value;
+
+  Any.fromJson(Map<String, dynamic> json) : value = json;
 }
 ''';
 
-    for (final unionType in unionTypes) {
-      combinedOutput += '''
-
-/// 
-class $unionType {
-  $unionType();
-
-  $unionType.fromJson(Map<String, dynamic> json);
-}
-''';
+    for (final unionType in globalSetOfUnionTypes) {
+      combinedOutput += unionType.classTemplate;
     }
 
     await buildStep.writeAsString(outputId, combinedOutput);

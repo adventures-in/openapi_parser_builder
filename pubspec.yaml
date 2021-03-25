@@ -1,5 +1,5 @@
-name: openapi_client_builder_builder
-description: Build openapi client builders from the OpenApi specification.
+name: openapi_client_builder
+description: Build openapi clients from the OpenApi specification.
 version: 0.0.1
 # homepage: https://www.example.com
 

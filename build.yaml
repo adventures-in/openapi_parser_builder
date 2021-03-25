@@ -1,13 +1,13 @@
 targets:
-  openapi_client_builder_builder:openapi_client_builder_builder:
+  openapi_client_builder:openapi_client_builder:
     builders:
-      openapi_client_builder_builder|clientBuilderBuilder:
+      openapi_client_builder|clientBuilder:
         enabled: True
 
 builders:
   clientBuilder:
-    import: 'package:openapi_client_builder_builder/openapi_client_builder_builder.dart'
-    builder_factories: ['clientBuilderBuilder']
+    import: 'package:openapi_client_builder/openapi_client_builder.dart'
+    builder_factories: ['clientBuilder']
     build_extensions:
       input/openapi_spec.md:
         - output/schema_classes.dart

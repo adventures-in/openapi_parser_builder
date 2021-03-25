@@ -1,10 +1,10 @@
 import 'package:html/dom.dart';
-import 'package:openapi_client_builder_builder/src/enums/fields_type.dart';
-import 'package:openapi_client_builder_builder/src/schema_class_member.dart';
-import 'package:openapi_client_builder_builder/src/extensions/string_extensions.dart';
+import 'package:openapi_client_builder/src/enums/fields_type.dart';
+import 'package:openapi_client_builder/src/schema/member_template.dart';
+import 'package:openapi_client_builder/src/schema/types/member_type.dart';
 
-class SchemaClassTemplate {
-  SchemaClassTemplate(
+class ClassTemplate {
+  ClassTemplate(
       {required FieldsType fieldsType,
       required Element classNameTag,
       required List<Element> classCommentTags,
@@ -31,8 +31,8 @@ class SchemaClassTemplate {
       final isRequired = (comment != null &&
           comment.length > 7 &&
           comment.substring(0, 8) == 'REQUIRED');
-      final member = SchemaClassMember(isRequired, comment,
-          rowParts.elementAt(1).trim().toMemberType(), rowParts.first.trim());
+      final member = MemberTemplate(isRequired, comment,
+          MemberType.from(rowParts.elementAt(1).trim()), rowParts.first.trim());
 
       _classMembers.add(member);
     }
@@ -76,7 +76,7 @@ class SchemaClassTemplate {
   late final List<Element> _classCommentTags;
   late final String _className;
   late final String _classComment;
-  final List<SchemaClassMember> _classMembers = [];
+  final List<MemberTemplate> _classMembers = [];
   late final String _constructorString;
   late final String _initializerListString;
   late final String _combinedClassMembersString;

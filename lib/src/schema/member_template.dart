@@ -1,10 +1,10 @@
-import 'package:openapi_client_builder_builder/src/member_type.dart';
-import 'package:openapi_client_builder_builder/src/type_kind.dart';
+import 'package:openapi_client_builder/src/schema/types/member_type.dart';
+import 'package:openapi_client_builder/src/enums/type_category.dart';
 
 /// Schema classes are created from the spec, this class holds the data used to
 /// construct the members of a schema class.
-class SchemaClassMember {
-  SchemaClassMember(
+class MemberTemplate {
+  MemberTemplate(
       this.isRequired, this.comment, MemberType memberType, String name)
       : _memberType = memberType,
         _rawName = name {
@@ -18,7 +18,7 @@ class SchemaClassMember {
   final String _rawName;
   late final String _sanitizedName;
 
-  TypeKind get typeKind => _memberType.kind;
+  TypeCategory get typeCategory => _memberType.category;
   String get typeValue =>
       isRequired ? _memberType.value : '${_memberType.value}?';
   String get typeValueWithoutNullability => _memberType.value;
@@ -26,11 +26,11 @@ class SchemaClassMember {
   String get rawName => _rawName;
 
   // Strings for building fromJson for List types.
-  String get listParameter => _memberType.listParameter;
-  String get listParameterFromJson => (_memberType.listParamterIsObject)
+  String get listParameter => _memberType.listParameter.value;
+  String get listParameterFromJson => (_memberType.listParameter.isObject)
       ? '$listParameter.fromJson(json)'
       : 'json[\'$name\']';
-  String get listCast => (_memberType.listParamterIsObject)
+  String get listCast => (_memberType.listParameter.isObject)
       ? ' as List<dynamic>).map<$listParameter>((json) => $listParameterFromJson).toList()'
       : '.cast<$listParameter>())';
   // If the member is not a required member, add a null check to the fromJson
@@ -40,19 +40,30 @@ class SchemaClassMember {
       (isRequired) ? '' : '(json[\'$name\'] == null) ? null :';
 
   // Strings for building fromJson for List types.
-  String get mapParameter => _memberType.mapParameter;
-  String get mapCast => (_memberType.listParamterIsObject)
+  String get mapParameter => _memberType.mapParameter.value;
+  String get mapCast => (_memberType.listParameter.isObject)
       ? '.map<String, $mapParameter>((entry) => entry)'
       : '.cast<String, $mapParameter>())';
 
-  String get fromJsonString => (typeKind == TypeKind.object ||
-          typeKind == TypeKind.union)
-      ? '    _$name = $objectNullCheck $typeValueWithoutNullability.fromJson(json[\'$name\'])'
-      : typeKind == TypeKind.list
-          ? '    _$name = (json[\'$name\'] $listNullCheck$listCast'
-          : typeKind == TypeKind.map
-              ? '    _$name = (json[\'$name\'] $listNullCheck$mapCast'
-              : '    _$name = json[\'$name\']';
+  String get firstParameter => _memberType.firstParameter.value;
+  String get secondParameter => _memberType.secondParameter.value;
+
+  String get fromJsonString {
+    if (typeCategory == TypeCategory.object ||
+        typeCategory == TypeCategory.union) {
+      return '    _$name = $objectNullCheck $typeValueWithoutNullability.fromJson(json[\'$name\'])';
+    }
+
+    if (typeCategory == TypeCategory.list) {
+      return '    _$name = (json[\'$name\'] $listNullCheck$listCast';
+    }
+
+    if (typeCategory == TypeCategory.map) {
+      '    _$name = (json[\'$name\'] $listNullCheck$mapCast';
+    }
+
+    return '    _$name = json[\'$name\']';
+  }
 
   String sanitize(String name) {
     final trimmed = name.trim();
