@@ -1,6 +1,8 @@
 import 'package:html/dom.dart';
+import 'package:openapi_client_builder/src/enums/fields_type.dart';
 import 'package:openapi_client_builder/src/schema/class_template.dart';
 import 'package:openapi_client_builder/src/extensions/string_extensions.dart';
+import 'package:openapi_client_builder/src/schema/class_template_patterned.dart';
 
 List<ClassTemplate> extractClassTemplates(Document document) {
   final list = <ClassTemplate>[];
@@ -28,12 +30,17 @@ List<ClassTemplate> extractClassTemplates(Document document) {
     if (tableTag == null || tableTag.text.split('\n').length < 3) continue;
 
     // Split up the table into rows and remove the formatting.
-    list.add(ClassTemplate(
-      fieldsType: nextTag.text.toFieldsType(),
-      classNameTag: classNameTag,
-      classCommentTags: classCommentTags,
-      tableRows: tableTag.text.split('\n')..removeRange(0, 2),
-    ));
+    list.add((nextTag.text.toFieldsType() == FieldsType.fixed
+        ? ClassTemplate(
+            classNameTag: classNameTag,
+            classCommentTags: classCommentTags,
+            tableTag: tableTag,
+          )
+        : ClassTemplatePatterned(
+            classNameTag: classNameTag,
+            classCommentTags: classCommentTags,
+            tableTag: tableTag,
+          )));
   }
 
   return list;
