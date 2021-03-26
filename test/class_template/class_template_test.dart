@@ -7,7 +7,7 @@ import 'package:test/test.dart';
 
 void main() {
   group('ClassTemplate', () {
-    test('accurately parses tables from the spec', () async {
+    test('accurately parses Path Item table', () async {
       final tableString =
           await File('test/data/markdown/path_item_table.md').readAsString();
 
@@ -19,13 +19,22 @@ void main() {
 
       final classTemplate = ClassTemplate(classNameTag: classNameTag);
 
-      expect(classTemplate.firstMember.variableName, 'ref');
+      // expect(classTemplate.firstMember.variableName, 'ref');
+    });
 
-      // final jsonMap = json.decode(jsonString) as Map<String, dynamic>;
+    test('accurately parses Paths table', () async {
+      final tableString =
+          await File('test/data/markdown/paths_table.md').readAsString();
 
-      // final openapi = OpenAPI.fromJson(jsonMap);
+      final tags = parse(markdownToHtml(tableString))
+          .documentElement!
+          .querySelectorAll('h4');
 
-      // print(openapi);
+      final classNameTag = tags.elementAt(0);
+
+      final classTemplate = ClassTemplate(classNameTag: classNameTag);
+
+      // expect(classTemplate.firstMember.variableName, 'pathsMap');
     });
   });
 }

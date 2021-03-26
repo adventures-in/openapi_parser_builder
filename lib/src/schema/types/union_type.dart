@@ -15,6 +15,9 @@ class UnionType extends MemberType {
   final String secondClassName;
   final String firstVariableName;
   final String secondVariableName;
+  String get fromJson => (secondClassName == 'RuntimeExpression')
+      ? '$secondClassName(json as String)'
+      : '$secondClassName(ref: json[\'\\\$ref\'])';
 
   String get classTemplate => '''
 
@@ -26,8 +29,8 @@ class $name {
   $secondClassName? $secondVariableName;
 
   $name.fromJson(Map<String, dynamic> json) :
-    $firstVariableName = (json[\'$firstVariableName\'] == null) ? null : $firstClassName.fromJson(json[\'$firstVariableName\']),
-    $secondVariableName = (json[\'\\\$ref\'] == null) ? null : $secondClassName.fromJson(json[\'\\\$ref\']);
+    $firstVariableName = (json[\'\\\$ref\'] == null) ? $firstClassName.fromJson(json) : null,
+    $secondVariableName = (json[\'\\\$ref\'] == null) ? null : $fromJson;
 }
 ''';
 }
