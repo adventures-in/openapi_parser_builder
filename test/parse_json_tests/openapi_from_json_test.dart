@@ -40,6 +40,23 @@ void main() {
 
       // OpenAPI paths member
       expect(openapi.paths is Paths, true);
+      final pathMap = openapi.paths.pathMap;
+      expect(pathMap.length, 174);
+      expect(pathMap.keys.first, '/v1/ageRatingDeclarations/{id}');
+      final pathItem = pathMap.values.first;
+      final patchOperation = pathItem.patch!;
+      expect(patchOperation.tags!.first, 'AgeRatingDeclarations');
+      expect(
+          patchOperation.operationId, 'ageRatingDeclarations-update_instance');
+      final requestBody = patchOperation.requestBody!.requestBody!;
+      expect(requestBody.description, 'AgeRatingDeclaration representation');
+      expect(requestBody.content.keys.first, 'application/json');
+      expect(requestBody.content.values.first is MediaType, true);
+      expect(requestBody.isRequired, true);
+      final mediaType = requestBody.content.values.first;
+      expect(mediaType.schema!.reference is Reference, true);
+      expect(mediaType.schema!.reference!.ref,
+          '#/components/schemas/AgeRatingDeclarationUpdateRequest');
     });
   });
 }

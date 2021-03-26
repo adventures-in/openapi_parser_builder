@@ -10,8 +10,12 @@ class MemberTemplate {
     _comment = rowParts.elementAtOrNull(2)?.trim();
     _isRequired = _comment?.startsWith('REQUIRED') == true;
     _memberType = MemberType.from(rowParts.elementAt(1).trim());
-    _rawVariableName = rowParts.first.trim();
-    _sanitizedName = sanitize(_rawVariableName);
+
+    // clean up variable names, leave the raw original for the json keys
+    final trimmed = rowParts.first.trim();
+    _variableName = sanitize(trimmed);
+    // we need to add a slash to escape the $ in $ref
+    _rawVariableName = trimmed.replaceAll(RegExp(r'\$'), r'\$');
   }
 
   MemberTemplate._({
@@ -19,13 +23,13 @@ class MemberTemplate {
     required String? comment,
     required MemberType memberType,
     required String rawVariableName,
-    required String sanitizedName,
+    required String variableName,
   }) {
     _comment = comment;
     _isRequired = isRequired;
     _memberType = memberType;
     _rawVariableName = rawTypeName;
-    _sanitizedName = sanitizedName;
+    _variableName = variableName;
   }
 
   MemberTemplate _copyWith(
@@ -33,24 +37,26 @@ class MemberTemplate {
           String? comment,
           MemberType? memberType,
           String? rawVariableName,
-          String? sanitizedName}) =>
+          String? variableName}) =>
       MemberTemplate._(
           isRequired: isRequired ?? _isRequired,
           comment: comment ?? _comment,
           memberType: memberType ?? _memberType,
           rawVariableName: rawVariableName ?? _rawVariableName,
-          sanitizedName: sanitizedName ?? _sanitizedName);
+          variableName: variableName ?? _variableName);
 
   late final bool _isRequired;
   late final String? _comment;
   late final MemberType _memberType;
   late final String _rawVariableName;
-  late final String _sanitizedName;
+  late final String _variableName;
 
   MemberTemplate convertToPatternedField() => _copyWith(
-      sanitizedName: '${_sanitizedName}Map',
+      isRequired: true,
+      variableName: '${_variableName}Map',
       memberType: MemberType(
           'Map<String, ${_memberType.name}>', TypeCategory.map,
+          patterned: true,
           parameterTypes: [
             MemberType('String', TypeCategory.primitive),
             _memberType
@@ -59,7 +65,7 @@ class MemberTemplate {
   String get typeName =>
       _isRequired ? _memberType.name : '${_memberType.name}?';
   String get rawTypeName => _memberType.name;
-  String get variableName => _sanitizedName;
+  String get variableName => _variableName;
   String get rawVariableName => _rawVariableName;
   String? get comment => _comment;
 
@@ -68,42 +74,52 @@ class MemberTemplate {
   // Strings for building fromJson for List types.
   String get listParameter => _memberType.listParameter.name;
   String get listFrom => (_memberType.listParameter.isObjectOrUnion)
-      ? 'json[\'$variableName\'].map<$listParameter>((item) => $listParameter.fromJson(item)).toList()'
-      : 'json[\'$variableName\'].map<$listParameter>((item) => item as $listParameter).toList()';
+      ? 'json[\'$rawVariableName\'].map<$listParameter>((item) => $listParameter.fromJson(item)).toList()'
+      : 'json[\'$rawVariableName\'].map<$listParameter>((item) => item as $listParameter).toList()';
   // If the member is not a required member, add a null check to the fromJson
-  String get mapNullCheck =>
-      (_isRequired) ? '' : '== null) ? null : (json[\'$variableName\']';
   String get objectNullCheck =>
-      (_isRequired) ? '' : '(json[\'$variableName\'] == null) ? null :';
+      (_isRequired) ? '' : '(json[\'$rawVariableName\'] == null) ? null :';
 
-  // Strings for building fromJson for List types.
-  String get mapParameter => _memberType.mapParameter.name;
-  String get mapFrom => (_memberType.mapParameter.isObjectOrUnion)
-      ? 'as Map<String, dynamic>).map<String, $mapParameter>((key, value) => MapEntry(key, $mapParameter.fromJson(value))'
-      : 'as Map<String, dynamic>).map<String, $mapParameter>((key, value) => MapEntry(key, value as $mapParameter)';
+  // Strings for building fromJson for Map types.
+  MemberType get mapSubtype => _memberType.mapParameter;
+  String get mapSubtypeName => _memberType.mapParameter.name;
+  String get mapNullCheck =>
+      (_isRequired) ? '' : '(json[\'$rawVariableName\'] == null) ? null : ';
+  String get newMapEntry => (_memberType.mapParameter.isObjectOrUnion)
+      ? 'MapEntry(key, $mapSubtypeName.fromJson(value))'
+      : (_memberType.mapParameter.isList)
+          ? 'MapEntry(key, (value as List<dynamic>).map<${mapSubtype.listParameter.name}>((item) => item as ${mapSubtype.listParameter.name}).toList())'
+          : 'MapEntry(key, value as $mapSubtypeName)';
+  String get mapCast => 'as Map<String, dynamic>)';
+  String get mapFromJsonPart =>
+      '.map<String, $mapSubtypeName>((key, value) => $newMapEntry)';
+  String get jsonForMap => _memberType.isPatterned
+      ? 'json'
+      : '(json[\'$rawVariableName\'] as Map<String, dynamic>)';
 
   String get fromJsonString {
     switch (_memberType.category) {
       case TypeCategory.object:
-        return '    _$variableName = $objectNullCheck $rawTypeName.fromJson(json[\'$variableName\'])';
+        return '    _$variableName = $objectNullCheck $rawTypeName.fromJson(json[\'$rawVariableName\'])';
       case TypeCategory.union:
-        return '    _$variableName = $objectNullCheck $rawTypeName.fromJson(json[\'$variableName\'])';
+        return '    _$variableName = $objectNullCheck $rawTypeName.fromJson(json[\'$rawVariableName\'])';
       case TypeCategory.list:
         return '    _$variableName = $objectNullCheck $listFrom';
       case TypeCategory.map:
-        return '    _$variableName = (json[\'$variableName\'] $mapNullCheck $mapFrom)';
+        return '    _$variableName = $mapNullCheck$jsonForMap$mapFromJsonPart';
       default:
-        return '    _$variableName = json[\'$variableName\']';
+        return '    _$variableName = json[\'$rawVariableName\']';
     }
   }
 
   // remove spaces, any $ or { or } symbols and replace any dart keywords
   String sanitize(String name) {
-    var trimmed = name.trim();
-    trimmed = trimmed.replaceAll(RegExp(r'{|}|\$'), '');
-    if (trimmed == 'in') return 'inValue';
-    if (trimmed == 'enum') return 'enums';
-    if (trimmed == 'default') return 'defaultValue';
-    return trimmed;
+    final checkedName = name.replaceAll(RegExp(r'{|}|\$'), '');
+    if (checkedName == 'required') return 'isRequired';
+    if (checkedName == 'in') return 'inValue';
+    if (checkedName == 'get') return 'getValue';
+    if (checkedName == 'enum') return 'enums';
+    if (checkedName == 'default') return 'defaultValue';
+    return checkedName;
   }
 }

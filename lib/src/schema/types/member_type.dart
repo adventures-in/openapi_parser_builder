@@ -3,11 +3,15 @@ import 'package:openapi_client_builder/src/schema/types/union_type.dart';
 import 'package:openapi_client_builder/src/state/global_set_of_union_types.dart';
 
 class MemberType {
-  MemberType(this.name, this.category, {List<MemberType>? parameterTypes})
-      : _parameterTypes = (parameterTypes == null) ? [] : parameterTypes;
+  MemberType(this.name, this.category,
+      {bool patterned = false, List<MemberType>? parameterTypes})
+      : _parameterTypes = (parameterTypes == null) ? [] : parameterTypes,
+        _patterned = patterned;
 
   String name;
   TypeCategory category;
+
+  final bool _patterned;
 
   final List<MemberType> _parameterTypes;
 
@@ -80,6 +84,7 @@ class MemberType {
   MemberType get firstParameter => _parameterTypes.first;
   MemberType get secondParameter => _parameterTypes.last;
 
+  bool get isPatterned => _patterned;
   bool get isObject => category == TypeCategory.object;
   bool get isList => category == TypeCategory.list;
   bool get isMap => category == TypeCategory.map;
