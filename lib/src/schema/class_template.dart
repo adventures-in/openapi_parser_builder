@@ -20,24 +20,24 @@ class ClassTemplate {
     //
     // Create class members by parsing the spec table.
 
-    _classMembers = tableTag.toMemberTemplates();
+    _members = tableTag.toMemberTemplates();
 
     // Iterate over members, creating parts of the class template.
 
-    _constructorString = _classMembers.toConstructorString();
-    _initializersString = _classMembers.toInilitializersString();
-    _gettersString = _classMembers.toGettersString();
-    _memberDeclarationsString = _classMembers.toDeclarationsString();
+    _constructorString = _members.toConstructorString();
+    _initializersString = _members.toInilitializersString();
+    _gettersString = _members.toGettersString();
+    _memberDeclarationsString = _members.toDeclarationsString();
 
     _fromJsonString = '''
   $_className.fromJson(Map<String, dynamic> json) :
-${_classMembers.toInitializersForFromJson()};
+${_members.toInitializersForFromJson()};
     ''';
   }
 
   late final String _className;
   late final String _classComment;
-  late final List<MemberTemplate> _classMembers;
+  late final List<MemberTemplate> _members;
   late final String _constructorString;
   late final String _initializersString;
   late final String _memberDeclarationsString;
@@ -46,7 +46,9 @@ ${_classMembers.toInitializersForFromJson()};
 
   String get classComment => _classComment;
   String get className => _className;
-  String get firstMemberName => _classMembers.first.name;
+  MemberTemplate get firstMember => _members.first;
+  String get initializersString => _initializersString;
+  String get constructorString => _constructorString;
 
   String get output => '''
 

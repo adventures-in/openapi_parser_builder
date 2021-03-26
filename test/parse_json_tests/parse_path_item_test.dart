@@ -7,7 +7,8 @@ import 'package:test/test.dart';
 void main() {
   group('Example PathItem json', () {
     test('parses correctly', () async {
-      final jsonString = await File('test/data/path_item.json').readAsString();
+      final jsonString =
+          await File('test/data/json/path_item.json').readAsString();
       final jsonMap = json.decode(jsonString) as Map<String, dynamic>;
 
       final pathItem = PathItem.fromJson(jsonMap);

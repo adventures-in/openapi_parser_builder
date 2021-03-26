@@ -1,3 +1,4 @@
+import 'package:openapi_client_builder/src/enums/type_category.dart';
 import 'package:openapi_client_builder/src/schema/types/member_type.dart';
 import 'package:openapi_client_builder/src/extensions/list_extensions.dart';
 
@@ -9,37 +10,35 @@ class MemberTemplate {
     _comment = rowParts.elementAtOrNull(2)?.trim();
     _isRequired = _comment?.startsWith('REQUIRED') == true;
     _memberType = MemberType.from(rowParts.elementAt(1).trim());
-    _rawName = rowParts.first.trim();
-    _sanitizedName = sanitize(_rawName);
+    _rawVariableName = rowParts.first.trim();
+    _sanitizedName = sanitize(_rawVariableName);
   }
 
   late final bool _isRequired;
-  late final bool _isReference; // references may need to use ref or $ref
   late final String? _comment;
   late final MemberType _memberType;
-  late final String _rawName;
+  late final String _rawVariableName;
   late final String _sanitizedName;
 
   String get typeName =>
       _isRequired ? _memberType.name : '${_memberType.name}?';
   String get rawTypeName => _memberType.name;
-  String get name => _sanitizedName;
-  String get rawName => _rawName;
+  String get variableName => _sanitizedName;
+  String get rawVariableName => _rawVariableName;
   String? get comment => _comment;
 
   bool get isRequired => _isRequired;
-  bool get isReference => _isReference;
 
   // Strings for building fromJson for List types.
   String get listParameter => _memberType.listParameter.name;
   String get listFrom => (_memberType.listParameter.isObjectOrUnion)
-      ? 'json[\'$name\'].map<$listParameter>((item) => $listParameter.fromJson(item)).toList()'
-      : 'json[\'$name\'].map<$listParameter>((item) => item as $listParameter).toList()';
+      ? 'json[\'$variableName\'].map<$listParameter>((item) => $listParameter.fromJson(item)).toList()'
+      : 'json[\'$variableName\'].map<$listParameter>((item) => item as $listParameter).toList()';
   // If the member is not a required member, add a null check to the fromJson
   String get mapNullCheck =>
-      (_isRequired) ? '' : '== null) ? null : (json[\'$name\']';
+      (_isRequired) ? '' : '== null) ? null : (json[\'$variableName\']';
   String get objectNullCheck =>
-      (_isRequired) ? '' : '(json[\'$name\'] == null) ? null :';
+      (_isRequired) ? '' : '(json[\'$variableName\'] == null) ? null :';
 
   // Strings for building fromJson for List types.
   String get mapParameter => _memberType.mapParameter.name;
@@ -47,39 +46,28 @@ class MemberTemplate {
       ? 'as Map<String, dynamic>).map<String, $mapParameter>((key, value) => MapEntry(key, $mapParameter.fromJson(value))'
       : 'as Map<String, dynamic>).map<String, $mapParameter>((key, value) => MapEntry(key, value as $mapParameter)';
 
-  // _content = (json['content']  as Map<String, dynamic>).map<String, MediaType>((key, value) => MapEntry(key, MediaType.fromJson(value)))),
-  // _callbacks = (json['callbacks'] == null) ? null : ((json['callbacks'] as Map<String, dynamic>).map<String, CallbackOrReference>((key, value) => MapEntry(key, CallbackOrReference.fromJson(value)))),
-
-  String get firstParameter => _memberType.firstParameter.name;
-  String get secondParameter => _memberType.secondParameter.name;
-
   String get fromJsonString {
-    if (_memberType.isObjectOrUnion) {
-      return '    _$name = $objectNullCheck $rawTypeName.fromJson(json[\'$name\'])';
+    switch (_memberType.category) {
+      case TypeCategory.object:
+        return '    _$variableName = $objectNullCheck $rawTypeName.fromJson(json[\'$variableName\'])';
+      case TypeCategory.union:
+        return '    _$variableName = $objectNullCheck $rawTypeName.fromJson(json[\'$variableName\'])';
+      case TypeCategory.list:
+        return '    _$variableName = $objectNullCheck $listFrom';
+      case TypeCategory.map:
+        return '    _$variableName = (json[\'$variableName\'] $mapNullCheck $mapFrom)';
+      default:
+        return '    _$variableName = json[\'$variableName\']';
     }
-
-    if (_memberType.isList) {
-      return '    _$name = $objectNullCheck $listFrom';
-    }
-
-    if (_memberType.isMap) {
-      return '    _$name = (json[\'$name\'] $mapNullCheck $mapFrom)';
-    }
-
-    return '    _$name = json[\'$name\']';
   }
 
+  // remove spaces, any $ or { or } symbols and replace any dart keywords
   String sanitize(String name) {
-    final trimmed = name.trim();
-    if (trimmed[0] == r'$') {
-      _isReference = true;
-      return trimmed.substring(1);
-    } else {
-      _isReference = false;
-    }
+    var trimmed = name.trim();
+    trimmed = trimmed.replaceAll(RegExp(r'{|}|\$'), '');
     if (trimmed == 'in') return 'inValue';
     if (trimmed == 'enum') return 'enums';
     if (trimmed == 'default') return 'defaultValue';
-    return name;
+    return trimmed;
   }
 }
