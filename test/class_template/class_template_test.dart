@@ -1,11 +1,9 @@
 import 'dart:io';
 
-import 'package:html/dom.dart';
 import 'package:html/parser.dart';
 import 'package:markdown/markdown.dart' hide Element;
 import 'package:openapi_client_builder/src/schema/class_template.dart';
 import 'package:test/test.dart';
-import 'package:openapi_client_builder/src/extensions/element_extensions.dart';
 
 void main() {
   group('ClassTemplate', () {
@@ -19,21 +17,7 @@ void main() {
 
       final classNameTag = tags.elementAt(0);
 
-      var classCommentTags = <Element>[];
-      var nextTag = classNameTag.nextElementSibling;
-      while (nextTag != null && nextTag.isNotTableHeader) {
-        // Keep adding to the commentTags and moving on.
-        classCommentTags.add(nextTag);
-        nextTag = nextTag.nextElementSibling;
-      }
-
-      final tableTag = nextTag!.nextElementSibling!;
-
-      final classTemplate = ClassTemplate(
-        classNameTag: classNameTag,
-        classCommentTags: classCommentTags,
-        tableTag: tableTag,
-      );
+      final classTemplate = ClassTemplate(classNameTag: classNameTag);
 
       expect(classTemplate.firstMember.variableName, 'ref');
 
