@@ -38,37 +38,35 @@ class ClassTemplate {
       throw 'Not a valid Schema Object';
     }
 
-    _fieldsType = nextTag!.text.toFieldsType();
     _members = tableTag.toMemberTemplates();
 
-    // Iterate over members, creating parts of the class template.
+    final fieldsType = nextTag!.text.toFieldsType();
 
+    if (fieldsType == FieldsType.patterned) {
+      if (_members.length > 1) {
+        throw 'More than one member: it is assumed that classes with Patterned Fields have only one member.';
+      }
+      final oldMember = _members.first;
+      _members.clear();
+      _members.add(oldMember.convertToPatternedField());
+    }
+
+    // Iterate over members, creating parts of the class template.
     _constructorString = _members.toConstructorString();
     _initializersString = _members.toInilitializersString();
     _gettersString = _members.toGettersString();
     _memberDeclarationsString = _members.toDeclarationsString();
-
-    _fromJsonString = '''
-  $_className.fromJson(Map<String, dynamic> json) :
-${_members.toInitializersForFromJson()};
-    ''';
+    _fromJsonString = _members.toFromJson(_className);
   }
 
-  late final FieldsType _fieldsType;
+  late final List<MemberTemplate> _members;
   late final String _className;
   late final String _classComment;
-  late final List<MemberTemplate> _members;
   late final String _constructorString;
   late final String _initializersString;
   late final String _memberDeclarationsString;
   late final String _gettersString;
   late final String _fromJsonString;
-
-  String get classComment => _classComment;
-  String get className => _className;
-  MemberTemplate get firstMember => _members.first;
-  String get initializersString => _initializersString;
-  String get constructorString => _constructorString;
 
   String get output => '''
 

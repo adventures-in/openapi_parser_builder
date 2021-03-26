@@ -9,14 +9,16 @@ extension ListOfMemberTemplateExtension on List<MemberTemplate> {
           (member) => '_${member.variableName} = ${member.variableName}')
       .join(', ');
 
+  String toDeclarationsString() => map<String>((member) =>
+          '  /// ${member.comment}\n  final ${member.typeName} _${member.variableName};')
+      .join('\n');
+
   String toGettersString() => map<String>((member) =>
           '  ${member.typeName} get ${member.variableName} => _${member.variableName};')
       .join('\n');
 
-  String toInitializersForFromJson() =>
-      map<String>((member) => member.fromJsonString).join(',\n');
-
-  String toDeclarationsString() => map<String>((member) =>
-          '  /// ${member.comment}\n  final ${member.typeName} _${member.variableName};')
-      .join('\n');
+  String toFromJson(String className) =>
+      '  $className.fromJson(Map<String, dynamic> json) :\n' +
+      map<String>((member) => member.fromJsonString).join(',\n') +
+      ';';
 }

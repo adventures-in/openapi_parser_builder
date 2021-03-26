@@ -14,11 +14,47 @@ class MemberTemplate {
     _sanitizedName = sanitize(_rawVariableName);
   }
 
+  MemberTemplate._({
+    required bool isRequired,
+    required String? comment,
+    required MemberType memberType,
+    required String rawVariableName,
+    required String sanitizedName,
+  }) {
+    _comment = comment;
+    _isRequired = isRequired;
+    _memberType = memberType;
+    _rawVariableName = rawTypeName;
+    _sanitizedName = sanitizedName;
+  }
+
+  MemberTemplate _copyWith(
+          {bool? isRequired,
+          String? comment,
+          MemberType? memberType,
+          String? rawVariableName,
+          String? sanitizedName}) =>
+      MemberTemplate._(
+          isRequired: isRequired ?? _isRequired,
+          comment: comment ?? _comment,
+          memberType: memberType ?? _memberType,
+          rawVariableName: rawVariableName ?? _rawVariableName,
+          sanitizedName: sanitizedName ?? _sanitizedName);
+
   late final bool _isRequired;
   late final String? _comment;
   late final MemberType _memberType;
   late final String _rawVariableName;
   late final String _sanitizedName;
+
+  MemberTemplate convertToPatternedField() => _copyWith(
+      sanitizedName: '${_sanitizedName}Map',
+      memberType: MemberType(
+          'Map<String, ${_memberType.name}>', TypeCategory.map,
+          parameterTypes: [
+            MemberType('String', TypeCategory.primitive),
+            _memberType
+          ]));
 
   String get typeName =>
       _isRequired ? _memberType.name : '${_memberType.name}?';

@@ -14,7 +14,32 @@ void main() {
 
       final openapi = OpenAPI.fromJson(jsonMap);
 
-      print(openapi);
-    }, skip: true);
+      // OpenAPI info member
+      expect(openapi.info is Info, true);
+      final info = openapi.info;
+      expect(info.title, 'App Store Connect API');
+      expect(info.description, null);
+      expect(info.termsOfService, null);
+      expect(info.contact, null);
+      expect(info.license, null);
+      expect(info.version, '1.2');
+
+      // OpenAPI servers member
+      expect(openapi.servers is List<Server>, true);
+      final server = openapi.servers!.first;
+      expect(server.description, null);
+      expect(server.variables, null);
+      expect(server.url, 'https://api.appstoreconnect.apple.com/');
+
+      // OpenAPI externalDocs member
+      expect(openapi.externalDocs is ExternalDocumentation, true);
+      final externalDocs = openapi.externalDocs!;
+      expect(externalDocs.description, 'App Store Connect API Documentation');
+      expect(externalDocs.url,
+          'https://developer.apple.com/documentation/appstoreconnectapi');
+
+      // OpenAPI paths member
+      expect(openapi.paths is Paths, true);
+    });
   });
 }
