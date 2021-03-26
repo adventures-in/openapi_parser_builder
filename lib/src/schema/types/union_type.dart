@@ -26,7 +26,7 @@ class $name {
   $secondClassName? $secondVariableName;
 
   $name.fromJson(Map<String, dynamic> json) :
-    $firstVariableName = (json[\'$firstVariableName}\'] == null) ? null : $firstClassName.fromJson(json[\'$firstVariableName\']),
+    $firstVariableName = (json[\'$firstVariableName\'] == null) ? null : $firstClassName.fromJson(json[\'$firstVariableName\']),
     $secondVariableName = (json[\'\\\$ref\'] == null) ? null : $secondClassName.fromJson(json[\'\\\$ref\']);
 }
 ''';

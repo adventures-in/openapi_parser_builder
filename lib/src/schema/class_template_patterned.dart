@@ -9,26 +9,5 @@ class ClassTemplatePatterned extends ClassTemplate {
       : super(
             classNameTag: classNameTag,
             classCommentTags: classCommentTags,
-            tableTag: tableTag) {
-    _patternedMemberString =
-        firstMemberName.replaceAll(RegExp(r'{|}'), '') + 'Map';
-  }
-
-  late final String _patternedMemberString;
-
-  @override
-  String get output => '''
-
-/// $classComment
-class $className {
-  $className();
-
-  Map<String, PathItem> $_patternedMemberString = {};
-
-  $className.fromJson(Map<String, dynamic> json) : 
-    $_patternedMemberString = {}..addEntries(json.entries.map(
-      (entry) => MapEntry(entry.key, PathItem.fromJson(entry.value))));
-}
-
-''';
+            tableTag: tableTag);
 }
