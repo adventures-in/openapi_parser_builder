@@ -1,15 +1,33 @@
 targets:
   openapi_client_builder:openapi_client_builder:
     builders:
+      openapi_client_builder|schemaBuilder:
+        enabled: True
       openapi_client_builder|clientBuilder:
         enabled: True
 
 builders:
-  clientBuilder:
+  schemaBuilder:
     import: 'package:openapi_client_builder/openapi_client_builder.dart'
-    builder_factories: ['clientBuilder']
+    builder_factories: 
+      - schemaBuilder
     build_extensions:
       input/openapi_spec.md:
         - output/schema_classes.dart
     build_to: source
     auto_apply: root_package
+    applies_builders:
+      - openapi_client_builder|clientBuilder
+    runs_before: 
+      - openapi_client_builder|clientBuilder
+  clientBuilder:
+    required_inputs:
+      - .dart
+    import: 'package:openapi_client_builder/openapi_client_builder.dart'
+    builder_factories: 
+      - clientBuilder
+    build_extensions:
+      input/app-store-connect-openapi.json:
+        - output/client.dart
+    build_to: source
+    auto_apply: root_package 

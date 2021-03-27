@@ -6,7 +6,7 @@ import 'package:markdown/markdown.dart';
 import 'package:openapi_client_builder/src/schema/class_template.dart';
 import 'package:openapi_client_builder/src/state/global_set_of_union_types.dart';
 
-class ClientBuilder implements Builder {
+class SchemaBuilder implements Builder {
   @override
   FutureOr<void> build(BuildStep buildStep) async {
     final inputId = buildStep.inputId;
