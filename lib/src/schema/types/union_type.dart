@@ -1,5 +1,5 @@
-import 'package:openapi_client_builder/src/schema/types/member_type.dart';
-import 'package:openapi_client_builder/src/enums/type_category.dart';
+import 'package:openapi_schema_builder/src/schema/types/member_type.dart';
+import 'package:openapi_schema_builder/src/enums/type_category.dart';
 
 class UnionType extends MemberType {
   UnionType(String value, {List<MemberType>? parameterTypes})

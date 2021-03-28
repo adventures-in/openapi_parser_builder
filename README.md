@@ -5,7 +5,7 @@
 A simple usage example:
 
 ```dart
-import 'package:openapi_client_builder/builder.dart';
+import 'package:openapi_schema_builder/builder.dart';
 
 main() {
   var awesome = new Awesome();
