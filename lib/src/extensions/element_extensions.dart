@@ -1,5 +1,5 @@
 import 'package:html/dom.dart';
-import 'package:openapi_client_builder/src/schema/member_template.dart';
+import 'package:openapi_schema_builder/src/schema/member_template.dart';
 
 extension ElementExtension on Element {
   /// The Element is assumed to be a markdown table with three columns and a

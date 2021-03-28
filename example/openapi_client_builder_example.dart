@@ -1,4 +1,4 @@
-// import 'package:openapi_client_builder/openapi_client_builder.dart';
+// import 'package:openapi_schema_builder/openapi_schema_builder.dart';
 
 void main() {
   // var awesome = Awesome();

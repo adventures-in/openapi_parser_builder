@@ -1,4 +1,4 @@
-import 'package:openapi_client_builder/src/schema/member_template.dart';
+import 'package:openapi_schema_builder/src/schema/member_template.dart';
 import 'package:test/test.dart';
 
 void main() {

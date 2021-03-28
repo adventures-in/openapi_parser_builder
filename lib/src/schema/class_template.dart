@@ -1,10 +1,10 @@
 import 'package:html/dom.dart';
-import 'package:openapi_client_builder/src/enums/fields_type.dart';
-import 'package:openapi_client_builder/src/schema/member_template.dart';
-import 'package:openapi_client_builder/src/extensions/list_of_element_extensions.dart';
-import 'package:openapi_client_builder/src/extensions/list_of_member_template_extension.dart';
-import 'package:openapi_client_builder/src/extensions/element_extensions.dart';
-import 'package:openapi_client_builder/src/extensions/string_extensions.dart';
+import 'package:openapi_schema_builder/src/enums/fields_type.dart';
+import 'package:openapi_schema_builder/src/schema/member_template.dart';
+import 'package:openapi_schema_builder/src/extensions/list_of_element_extensions.dart';
+import 'package:openapi_schema_builder/src/extensions/list_of_member_template_extension.dart';
+import 'package:openapi_schema_builder/src/extensions/element_extensions.dart';
+import 'package:openapi_schema_builder/src/extensions/string_extensions.dart';
 
 /// The first pass of parsing the spec document has produced a set data items,
 /// each corresponding to a schema that we want a class template for.

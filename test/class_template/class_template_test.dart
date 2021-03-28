@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:html/parser.dart';
 import 'package:markdown/markdown.dart' hide Element;
-import 'package:openapi_client_builder/src/schema/class_template.dart';
+import 'package:openapi_schema_builder/src/schema/class_template.dart';
 import 'package:test/test.dart';
 
 void main() {
