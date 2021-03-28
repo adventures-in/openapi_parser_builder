@@ -4,6 +4,6 @@
 library openapi_client_builder;
 
 import 'package:build/build.dart';
-import 'package:openapi_client_builder/src/client_builder.dart';
+import 'package:openapi_client_builder/src/builders/client_builder.dart';
 
 Builder clientBuilder(BuilderOptions options) => ClientBuilder();

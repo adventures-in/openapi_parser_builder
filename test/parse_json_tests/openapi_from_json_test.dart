@@ -8,7 +8,7 @@ void main() {
   group('AppStore Connect OpenAPI file', () {
     test('parses correctly', () async {
       final jsonString =
-          await File('test/data/json/app-store-connect-openapi-spec.json')
+          await File('test/data/json/app-store-connect-openapi.json')
               .readAsString();
       final jsonMap = json.decode(jsonString) as Map<String, dynamic>;
 
