@@ -1,4 +1,4 @@
-import 'package:openapi_schema_builder/src/enums/fields_type.dart';
+import 'package:openapi_parser_builder/src/enums/fields_type.dart';
 
 extension StringExtension on String {
   FieldsType toFieldsType() {

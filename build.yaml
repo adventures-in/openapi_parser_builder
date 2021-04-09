@@ -1,12 +1,12 @@
 targets:
-  openapi_schema_builder:
+  openapi_parser_builder:
     builders:
-      openapi_schema_builder:schemaBuilder:
+      openapi_parser_builder:schemaBuilder:
         enabled: true
 
 builders:
   schemaBuilder:
-    import: package:openapi_schema_builder/openapi_schema_builder.dart
+    import: package:openapi_parser_builder/openapi_parser_builder.dart
     builder_factories: [ schemaBuilder ]
     build_extensions:
       input/openapi_spec.md: [ output/schema_classes.dart ]
