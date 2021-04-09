@@ -1,4 +1,4 @@
-name: openapi_schema_builder
+name: openapi_parser_builder
 description: Build openapi clients from the OpenApi specification.
 version: 0.0.1
 # homepage: https://www.example.com

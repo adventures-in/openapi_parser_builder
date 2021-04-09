@@ -1,4 +1,4 @@
-import 'package:openapi_schema_builder/src/schema/member_template.dart';
+import 'package:openapi_parser_builder/src/schema/member_template.dart';
 
 extension ListOfMemberTemplateExtension on List<MemberTemplate> {
   String toConstructorString() => map<String>((member) =>

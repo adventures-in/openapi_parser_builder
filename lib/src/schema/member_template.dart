@@ -1,6 +1,6 @@
-import 'package:openapi_schema_builder/src/enums/type_category.dart';
-import 'package:openapi_schema_builder/src/schema/types/member_type.dart';
-import 'package:openapi_schema_builder/src/extensions/list_extensions.dart';
+import 'package:openapi_parser_builder/src/enums/type_category.dart';
+import 'package:openapi_parser_builder/src/schema/types/member_type.dart';
+import 'package:openapi_parser_builder/src/extensions/list_extensions.dart';
 
 /// Schema classes are created from the spec, this class holds the data used to
 /// construct the members of a schema class.

@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:build/build.dart';
 import 'package:html/parser.dart';
 import 'package:markdown/markdown.dart';
-import 'package:openapi_schema_builder/src/schema/class_template.dart';
-import 'package:openapi_schema_builder/src/state/global_set_of_union_types.dart';
+import 'package:openapi_parser_builder/src/schema/class_template.dart';
+import 'package:openapi_parser_builder/src/state/global_set_of_union_types.dart';
 
 class SchemaBuilder implements Builder {
   @override

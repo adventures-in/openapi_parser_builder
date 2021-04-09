@@ -1,6 +1,6 @@
-import 'package:openapi_schema_builder/src/enums/type_category.dart';
-import 'package:openapi_schema_builder/src/schema/types/union_type.dart';
-import 'package:openapi_schema_builder/src/state/global_set_of_union_types.dart';
+import 'package:openapi_parser_builder/src/enums/type_category.dart';
+import 'package:openapi_parser_builder/src/schema/types/union_type.dart';
+import 'package:openapi_parser_builder/src/state/global_set_of_union_types.dart';
 
 class MemberType {
   MemberType(this.name, this.category,

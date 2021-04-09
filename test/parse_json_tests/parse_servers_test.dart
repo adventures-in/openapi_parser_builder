@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:openapi_schema_builder/output/schema_classes.dart';
+import 'package:openapi_parser_builder/output/schema_classes.dart';
 import 'package:test/test.dart';
 
 void main() {
