@@ -1,4 +1,4 @@
-# Build openapi clients from the OpenApi specification
+# Build a parser of openapi files from the OpenApi specification
 
 ## Usage
 
